@@ -207,11 +207,11 @@ export default function AdminPortal({ user }) {
           <div className={`ai-status ${aiStatus.available ? 'ok' : 'off'}`}>
             {aiStatus.available ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
             <div>
-              <strong>{aiStatus.available ? 'AI assistant online' : 'AI assistant not configured'}</strong>
+              <strong>{aiStatus.available ? 'AI assistant online' : 'AI assistant unreachable'}</strong>
               <p>
                 {aiStatus.available
-                  ? `Model: ${aiStatus.model}`
-                  : 'Add AI_API_KEY in Vercel → Settings → Environment Variables to enable it.'}
+                  ? `${aiStatus.free ? 'Free provider (no key) · ' : ''}Model: ${aiStatus.model} · ${aiStatus.provider || ''}`
+                  : 'The free AI provider could not be reached. Check the network and the /api/ai function.'}
               </p>
             </div>
           </div>

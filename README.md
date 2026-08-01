@@ -8,7 +8,7 @@ everything you save. Google and Email/Password sign-in are supported.
 
 | Feature | Route | What it does |
 | --- | --- | --- |
-| AI assistant | chat widget (bottom-right) | Ask questions; powered by an LLM via `/api/ai` |
+| AI assistant | chat widget (bottom-right) | Free LLM via `/api/ai` — no API key needed |
 | Symptom guide | `#/` | Safety-first guidance + optional AI review; save to your account |
 | Daily check-in | `#/` | Track how you feel day to day; saved privately |
 | Doctor directory | `#/doctors` | Browse clinicians, book appointments, video-consult flow |
@@ -27,21 +27,26 @@ npm run dev
 
 Create a production build with `npm run build`.
 
-## AI setup (required for the AI assistant)
+## AI setup — free, no API key needed
 
-The AI runs through a Vercel serverless function (`api/ai.js`) so your API key
-never ships to the browser. It works with any OpenAI-compatible provider.
-Add these environment variables in **Vercel → Settings → Environment
-Variables** (or a local `.env`):
+The AI works out of the box at **zero cost**. The app talks to a Vercel
+serverless function (`api/ai.js`), which by default calls **Pollinations.ai** —
+a free, keyless, OpenAI-compatible provider (free models cost nothing, no
+signup). No environment variables are required.
+
+To raise the free rate limit (~1 request / 5s), you can optionally register a
+free key at <https://enter.pollinations.ai> and set `AI_API_KEY` — the proxy
+will then use that key with the free provider. You can also point `AI_API_KEY`
+at any other OpenAI-compatible provider:
 
 ```
-AI_API_KEY=sk-...          # required (or OPENAI_API_KEY)
+AI_API_KEY=sk-...          # optional — free provider is used without it
 AI_BASE_URL=https://api.openai.com/v1   # optional, override for other providers
-AI_MODEL=gpt-4o-mini        # optional
+AI_MODEL=openai            # optional — free default is "openai"
 ```
 
-If `AI_API_KEY` is not set, the app still works — the AI features gracefully
-fall back to offline, rule-based guidance and tell you what to configure.
+If the AI service is ever unreachable, the app gracefully falls back to
+offline, rule-based guidance — it never breaks.
 
 ## Firebase setup
 

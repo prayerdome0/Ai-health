@@ -561,7 +561,7 @@ export default function App() {
       </footer>
 
       <DisclaimerNotice />
-      <AiChat />
+      <AiChat user={user} />
 
       <AuthModal
         isOpen={authModalOpen}

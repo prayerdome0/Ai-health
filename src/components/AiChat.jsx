@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { collection, addDoc, getDocs, limit, orderBy, query, serverTimestamp } from 'firebase/firestore'
 import { Bot, Send, Sparkles, X } from 'lucide-react'
-import { askAI, getAIStatus } from '../ai'
+import { askAI, getAIStatus, getUserHealthContext } from '../ai'
+import { db } from '../firebase'
 
 const QUICK_QUESTIONS = [
   'I have a headache and feel tired — what should I do?',
@@ -8,33 +10,82 @@ const QUICK_QUESTIONS = [
   'How can I manage stress?',
 ]
 
-export default function AiChat() {
+const HISTORY_LIMIT = 60
+
+export default function AiChat({ user }) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
-  const [status, setStatus] = useState(null) // null | {available}
+  const [status, setStatus] = useState(null) // null | {available, free, provider}
+  const [historyLoaded, setHistoryLoaded] = useState(false)
   const bottomRef = useRef(null)
 
   useEffect(() => {
     getAIStatus().then(setStatus).catch(() => setStatus({ available: false }))
   }, [])
 
+  // Load the signed-in user's saved chat history from Firestore once.
+  useEffect(() => {
+    if (!user || historyLoaded) return
+    let alive = true
+    ;(async () => {
+      try {
+        const snap = await getDocs(
+          query(
+            collection(db, 'users', user.uid, 'chatMessages'),
+            orderBy('createdAt', 'asc'),
+            limit(HISTORY_LIMIT)
+          )
+        )
+        if (!alive || snap.empty) return
+        setMessages(
+          snap.docs.map((d) => ({ role: d.data().role, content: d.data().content }))
+        )
+      } catch (err) {
+        console.warn('Could not load chat history:', err)
+      } finally {
+        if (alive) setHistoryLoaded(true)
+      }
+    })()
+    return () => {
+      alive = false
+    }
+  }, [user, historyLoaded])
+
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, busy, open])
+
+  const persist = async (role, content) => {
+    if (!user) return
+    try {
+      await addDoc(collection(db, 'users', user.uid, 'chatMessages'), {
+        role,
+        content,
+        createdAt: serverTimestamp(),
+      })
+    } catch (err) {
+      console.warn('Could not save chat message:', err)
+    }
+  }
 
   const send = async (text) => {
     const content = (text || input).trim()
     if (!content || busy) return
     setInput('')
-    setMessages((m) => [...m, { role: 'user', content }])
+    const updated = [...messages, { role: 'user', content }]
+    setMessages(updated)
     setBusy(true)
-    const result = await askAI({
-      messages: [...messages, { role: 'user', content }],
-    })
+
+    // Attach the user's latest saved records (Firebase context) when signed in.
+    const context = user ? await getUserHealthContext(user) : null
+    const result = await askAI({ messages: updated, context })
+
     setBusy(false)
-    setMessages((m) => [...m, { role: 'assistant', content: result.reply }])
+    setMessages([...updated, { role: 'assistant', content: result.reply }])
+    persist('user', content)
+    persist('assistant', result.reply)
   }
 
   return (
@@ -49,7 +100,9 @@ export default function AiChat() {
               <strong>Vitalis AI</strong>
               <p>
                 {status?.available
-                  ? 'Connected · general guidance only'
+                  ? status.free
+                    ? 'Free AI · connected'
+                    : 'AI · connected'
                   : 'Offline mode · basic guidance'}
               </p>
             </div>
@@ -101,7 +154,11 @@ export default function AiChat() {
               <Send size={16} />
             </button>
           </form>
-          <p className="ai-chat-foot">Not medical advice. Emergencies → call local services.</p>
+          <p className="ai-chat-foot">
+            {user
+              ? 'Chat history saved to your private account · Not medical advice'
+              : 'Not medical advice · Sign in to save your chat history'}
+          </p>
         </div>
       )}
       <button

@@ -20,11 +20,16 @@ global.self = window
 global.MutationObserver = window.MutationObserver
 global.Event = window.Event
 global.CustomEvent = window.CustomEvent
-global.fetch = async (url) => {
-  if (String(url).includes('/api/ai')) {
-    return { ok: true, status: 200, json: async () => ({ available: false, model: null }) }
+global.fetch = async (url, opts) => {
+  const u = String(url)
+  if (u.includes('/api/ai')) {
+    if (!opts || !opts.method || opts.method === 'GET') {
+      return { ok: true, status: 200, json: async () => ({ available: true, model: 'openai', provider: 'pollinations.ai (free, no key)', free: true }) }
+    }
+    // simulate the free provider answering through the proxy
+    return { ok: true, status: 200, json: async () => ({ reply: 'Free AI reply: rest, hydrate, and monitor your symptoms.', model: 'openai', provider: 'pollinations.ai (free, no key)', free: true }) }
   }
-  throw new Error('no network in test: ' + url)
+  throw new Error('no network in test: ' + u)
 }
 window.fetch = global.fetch
 window.matchMedia = window.matchMedia || (() => ({ matches: false, addListener() {}, removeListener() {} }))
@@ -79,12 +84,13 @@ try {
   const aiReviewBtn = [...window.document.querySelectorAll('button')].find((b) => b.textContent.includes('Ask AI to review'))
   aiReviewBtn?.click()
   await waitFor(600)
-  checks.push(['AI review offline reply', text().includes("I'm in offline mode")])
+  checks.push(['AI review free reply', text().includes('Free AI reply')])
 
   const fab = [...window.document.querySelectorAll('button')].find((b) => b.getAttribute('aria-label') === 'Open AI assistant')
   fab?.click()
   await waitFor(300)
   checks.push(['AI chat opens', text().includes("Hi, I'm Vitalis")])
+  checks.push(['AI chat shows free status', text().includes('Free AI · connected')])
 
   let failed = 0
   for (const [name, ok] of checks) {

@@ -1,22 +1,31 @@
 /**
  * Vitalis AI proxy — Vercel serverless function.
  *
- * POST /api/ai   { messages: [{ role, content }], context? }
- *   -> { reply, model, provider }  when an AI provider is configured
- *   -> 503 { available: false, reason }  when no provider is configured
- * GET  /api/ai
- *   -> { available: boolean, model }
+ * FREE BY DEFAULT — no API key required.
+ *   Uses Pollinations.ai (https://text.pollinations.ai/openai), a free,
+ *   keyless, OpenAI-compatible provider (free models cost 0 credits).
+ *   Rate-limited to ~1 request / 5s on the free tier.
  *
- * Configure any OpenAI-compatible provider with environment variables:
- *   AI_API_KEY   (or OPENAI_API_KEY)  - provider API key
- *   AI_BASE_URL  (default https://api.openai.com/v1)
- *   AI_MODEL     (default gpt-4o-mini)
+ * OPTIONAL UPGRADE — set environment variables for any OpenAI-compatible
+ * provider (or to raise Pollinations limits with a free registered key):
+ *   AI_API_KEY          (or OPENAI_API_KEY) - provider API key
+ *   AI_BASE_URL         (default https://api.openai.com/v1)
+ *   AI_MODEL            (default gpt-4o-mini when a key is set;
+ *                        default "openai" on the free provider)
+ *
+ * POST /api/ai   { messages: [{ role, content }], context? }
+ *   -> { reply, model, provider, free }
+ * GET  /api/ai
+ *   -> { available, model, provider, free }
  */
 
+const FREE_ENDPOINT = 'https://text.pollinations.ai/openai'
+const FREE_MODEL = 'openai'
 const DEFAULT_MODEL = 'gpt-4o-mini'
 const DEFAULT_BASE_URL = 'https://api.openai.com/v1'
 const MAX_HISTORY = 12
 const MAX_USER_MESSAGE = 3000
+const MAX_CONTEXT = 2000
 
 const SYSTEM_PROMPT = `You are Vitalis, the health guidance assistant inside a wellness app.
 
@@ -35,7 +44,7 @@ Your job is to give calm, safety-first health guidance. Follow these rules stric
    say so and advise consulting a qualified healthcare professional.
 6. Reply in the same language the user writes in.
 7. Never claim to have access to the user's saved records unless they are included
-   in the message you receive.`
+   in the context you receive.`
 
 function cors(res) {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -52,17 +61,35 @@ export default async function handler(req, res) {
   }
 
   const apiKey = process.env.AI_API_KEY || process.env.OPENAI_API_KEY || ''
-  const baseUrl = (process.env.AI_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, '')
-  const model = process.env.AI_MODEL || DEFAULT_MODEL
+  const free = !apiKey
 
-  const config = {
-    available: Boolean(apiKey),
-    model,
-    provider: apiKey ? new URL(baseUrl).hostname : null,
-  }
+  const config = free
+    ? {
+        free: true,
+        mode: 'free',
+        model: process.env.AI_MODEL || FREE_MODEL,
+        provider: 'pollinations.ai (free, no key)',
+        endpoint: FREE_ENDPOINT,
+        headers: {},
+      }
+    : {
+        free: false,
+        mode: 'openai',
+        model: process.env.AI_MODEL || DEFAULT_MODEL,
+        provider: (process.env.AI_BASE_URL || DEFAULT_BASE_URL).replace(/^https?:\/\//, '').replace(/\/+$/, ''),
+        endpoint: `${(process.env.AI_BASE_URL || DEFAULT_BASE_URL).replace(/\/+$/, '')}/chat/completions`,
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+      }
 
   if (req.method === 'GET') {
-    res.status(200).json(config)
+    res.status(200).json({
+      available: true,
+      model: config.model,
+      provider: config.provider,
+      free: config.free,
+    })
     return
   }
 
@@ -71,18 +98,12 @@ export default async function handler(req, res) {
     return
   }
 
-  if (!config.available) {
-    res.status(503).json({
-      available: false,
-      reason: 'AI is not configured yet. Add the AI_API_KEY environment variable in Vercel to enable the AI assistant.',
-    })
-    return
-  }
-
   let messages = []
+  let context = ''
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body
     messages = Array.isArray(body?.messages) ? body.messages : []
+    context = typeof body?.context === 'string' ? body.context.slice(0, MAX_CONTEXT) : ''
   } catch {
     res.status(400).json({ error: 'Invalid JSON body' })
     return
@@ -101,19 +122,31 @@ export default async function handler(req, res) {
     }))
     .slice(-MAX_HISTORY)
 
-  const payload = {
-    model,
-    messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...sanitized],
-    max_tokens: 700,
-    temperature: 0.4,
-  }
+  let system = SYSTEM_PROMPT
+  if (context) system += `\n\nContext from the user's saved records (private, only for this conversation):\n${context}`
+
+  const payload =
+    config.mode === 'free'
+      ? {
+          model: config.model,
+          messages: [{ role: 'system', content: system }, ...sanitized],
+          temperature: 0.4,
+          seed: 42,
+          private: true,
+        }
+      : {
+          model: config.model,
+          messages: [{ role: 'system', content: system }, ...sanitized],
+          max_tokens: 700,
+          temperature: 0.4,
+        }
 
   try {
-    const upstream = await fetch(`${baseUrl}/chat/completions`, {
+    const upstream = await fetch(config.endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        ...config.headers,
       },
       body: JSON.stringify(payload),
     })
@@ -135,7 +168,7 @@ export default async function handler(req, res) {
       return
     }
 
-    res.status(200).json({ reply, model, provider: config.provider })
+    res.status(200).json({ reply, model: config.model, provider: config.provider, free: config.free })
   } catch (err) {
     console.error('AI proxy failure:', err)
     res.status(502).json({ error: 'Could not reach the AI provider.' })
