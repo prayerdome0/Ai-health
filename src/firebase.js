@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app'
+import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
@@ -13,8 +13,19 @@ const firebaseConfig = {
   appId: '1:1018985914953:web:b7cb637a61a7de59299598',
 }
 
-const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
-export const db = getFirestore(app)
-export const googleProvider = new GoogleAuthProvider()
+let app = null
+let auth = null
+let db = null
+let googleProvider = null
+
+try {
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
+  auth = getAuth(app)
+  db = getFirestore(app)
+  googleProvider = new GoogleAuthProvider()
+} catch (error) {
+  console.warn('Firebase initialization warning:', error)
+}
+
+export { auth, db, googleProvider }
 export default app

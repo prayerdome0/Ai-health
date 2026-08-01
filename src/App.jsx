@@ -22,22 +22,52 @@ function assessmentFor(selected) {
 
 export default function App() {
   const [user, setUser] = useState(null), [chosen, setChosen] = useState([]), [note, setNote] = useState(''), [answers, setAnswers] = useState(Array(3).fill('')), [saved, setSaved] = useState(false), [message, setMessage] = useState('')
-  useEffect(() => onAuthStateChanged(auth, setUser), [])
+  useEffect(() => {
+    if (!auth) {
+      setUser(null)
+      return
+    }
+    try {
+      const unsubscribe = onAuthStateChanged(
+        auth,
+        (u) => setUser(u),
+        (err) => {
+          console.warn('Auth state change warning:', err)
+          setUser(null)
+        }
+      )
+      return () => unsubscribe()
+    } catch (e) {
+      console.warn('Firebase auth listener warning:', e)
+      setUser(null)
+    }
+  }, [])
   const assessment = useMemo(() => assessmentFor(chosen), [chosen])
   const toggle = symptom => setChosen(current => current.includes(symptom) ? current.filter(x => x !== symptom) : [...current, symptom])
-  const login = async () => { try { await signInWithPopup(auth, googleProvider); setMessage('') } catch { setMessage('Sign-in is unavailable. Enable Google in Firebase Authentication and authorize this domain.') } }
+  const login = async () => {
+    if (!auth || !googleProvider) {
+      setMessage('Sign-in is unavailable in this environment.')
+      return
+    }
+    try {
+      await signInWithPopup(auth, googleProvider)
+      setMessage('')
+    } catch {
+      setMessage('Sign-in is unavailable. Enable Google in Firebase Authentication and authorize this domain.')
+    }
+  }
   const saveAssessment = async () => {
     if (!assessment) return setMessage('Select at least one symptom to receive a safety-guided assessment.')
-    if (!user) return setMessage('Sign in to securely save your assessment.')
+    if (!user || !db) return setMessage('Sign in to securely save your assessment.')
     try { await addDoc(collection(db, 'users', user.uid, 'assessments'), { symptoms: chosen, note, urgency: assessment.level, createdAt: serverTimestamp() }); setSaved(true); setMessage('') } catch { setMessage('We could not save this right now. Please try again.') }
   }
   const saveCheckin = async () => {
     if (answers.some(a => !a)) return setMessage('Please answer each daily check-in question.')
-    if (!user) return setMessage('Sign in to securely save your check-in.')
+    if (!user || !db) return setMessage('Sign in to securely save your check-in.')
     try { await addDoc(collection(db, 'users', user.uid, 'checkIns'), { answers, createdAt: serverTimestamp() }); setMessage('Your daily check-in is saved.') } catch { setMessage('We could not save this right now. Please try again.') }
   }
   return <main>
-    <nav><div className="brand"><span><HeartPulse size={20}/></span>vitalis</div><div className="nav-right"><a href="#assessment">Symptom guide</a><a href="#checkin">Daily check-in</a>{user ? <button className="profile" onClick={() => signOut(auth)}><img src={user.photoURL || ''}/><span>{user.displayName?.split(' ')[0] || 'Account'}</span><LogOut size={15}/></button> : <button className="sign-in" onClick={login}><LogIn size={16}/> Sign in</button>}</div></nav>
+    <nav><div className="brand"><span><HeartPulse size={20}/></span>vitalis</div><div className="nav-right"><a href="#assessment">Symptom guide</a><a href="#checkin">Daily check-in</a>{user ? <button className="profile" onClick={() => auth && signOut(auth).catch(() => {})}><img src={user.photoURL || ''} alt=""/><span>{user.displayName?.split(' ')[0] || 'Account'}</span><LogOut size={15}/></button> : <button className="sign-in" onClick={login}><LogIn size={16}/> Sign in</button>}</div></nav>
     <section className="hero"><div className="hero-copy"><div className="eyebrow"><Sparkles size={14}/> PERSONAL HEALTH GUIDANCE</div><h1>Clarity for every<br/><em>health question.</em></h1><p>Use a thoughtful symptom guide, record how you feel, and get clear next-step guidance—without replacing your clinician.</p><a className="hero-button" href="#assessment">Check symptoms <ArrowRight size={18}/></a><div className="trust"><ShieldCheck size={17}/> Private by design · Built for guidance, not diagnosis</div></div><div className="hero-photo"><img src={clinicianImage} alt="Clinician holding a tablet"/><div className="photo-card"><CheckCircle2/><span>Support that puts<br/>your safety first</span></div></div></section>
     <section className="safety-strip"><AlertTriangle size={18}/><span><b>Emergency?</b> If you have severe chest pain, severe breathing difficulty, stroke symptoms, loss of consciousness, or feel unsafe, seek emergency help immediately.</span></section>
     <section className="assessment section" id="assessment"><div className="section-intro"><p className="overline">SYMPTOM GUIDE</p><h2>Let’s understand<br/>what’s going on.</h2><p>Select the symptoms you notice. Our guide flags when prompt in-person care could be important and helps you prepare for a conversation with a healthcare professional.</p><div className="privacy-note"><ShieldCheck size={17}/> Nothing is saved unless you choose to save it.</div></div><div className="assessment-card"><div className="card-top"><span className="ai-icon"><Bot size={21}/></span><div><h3>Health guidance assistant</h3><p>Choose all that apply today</p></div></div><div className="symptom-grid">{symptoms.map(symptom => <button className={chosen.includes(symptom) ? 'symptom selected' : 'symptom'} onClick={() => { toggle(symptom); setSaved(false) }} key={symptom}>{chosen.includes(symptom) && <CheckCircle2 size={16}/>} {symptom}</button>)}</div><label className="note-label">Anything else you’d like to note? <span>Optional</span><textarea value={note} onChange={e => setNote(e.target.value)} placeholder="For example: when it started, what makes it better or worse…"/></label><button className="complete wide" onClick={saveAssessment}>Review my symptoms <ArrowRight size={17}/></button>{message && <p className="notice">{message}</p>}{assessment && <div className={`result ${assessment.tone}`}><div><span className="result-icon">{assessment.tone === 'urgent' ? <AlertTriangle/> : <Activity/>}</span><div><p className="overline">SAFETY GUIDANCE</p><h3>{assessment.level}</h3></div></div><p>{assessment.text}</p><strong>Topics to discuss with a clinician</strong><ul>{assessment.topics.map(topic => <li key={topic}><ChevronRight size={15}/>{topic}</li>)}</ul><p className="disclaimer">This is not a diagnosis. Only a qualified healthcare professional can diagnose a condition.</p>{!saved && <button className="save-link" onClick={saveAssessment}>{user ? 'Save this assessment' : 'Sign in to save'}</button>}{saved && <p className="saved"><CheckCircle2 size={16}/> Assessment saved securely.</p>}</div>}</div></section>
