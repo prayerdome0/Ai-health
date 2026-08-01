@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   signInWithPopup,
   signInWithEmailAndPassword,
@@ -6,6 +6,7 @@ import {
   updateProfile,
 } from 'firebase/auth'
 import {
+  X,
   LogIn,
   Mail,
   Lock,
@@ -16,9 +17,8 @@ import {
   CheckCircle2,
   HeartPulse,
 } from 'lucide-react'
-import { auth, googleProvider } from '../firebase'
 
-function getFriendlyAuthError(error: any) {
+function getFriendlyAuthError(error) {
   const code = error?.code || ''
   switch (code) {
     case 'auth/invalid-credential':
@@ -33,6 +33,8 @@ function getFriendlyAuthError(error: any) {
       return 'Please enter a valid email address.'
     case 'auth/too-many-requests':
       return 'Too many unsuccessful attempts. Please try again later.'
+    case 'auth/network-request-failed':
+      return 'Network error. Please check your internet connection.'
     default:
       return (
         error?.message ||
@@ -41,15 +43,39 @@ function getFriendlyAuthError(error: any) {
   }
 }
 
-export default function SignUp() {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signup')
+export default function AuthModal({
+  isOpen,
+  onClose,
+  auth,
+  googleProvider,
+  initialMode = 'signin',
+}) {
+  const [mode, setMode] = useState(initialMode) // 'signin' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode)
+      setError('')
+    }
+  }, [isOpen, initialMode])
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onClose()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, onClose])
+
+  if (!isOpen) return null
 
   const handleGoogleSignIn = async () => {
     if (!auth || !googleProvider) {
@@ -58,10 +84,9 @@ export default function SignUp() {
     }
     setLoading(true)
     setError('')
-    setSuccess('')
     try {
       await signInWithPopup(auth, googleProvider)
-      setSuccess('Successfully signed in with Google!')
+      onClose()
     } catch (err) {
       setError(getFriendlyAuthError(err))
     } finally {
@@ -69,7 +94,7 @@ export default function SignUp() {
     }
   }
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
+  const handleEmailSubmit = async (e) => {
     e.preventDefault()
     if (!auth) {
       setError('Authentication is not available in this environment.')
@@ -81,11 +106,9 @@ export default function SignUp() {
     }
     setLoading(true)
     setError('')
-    setSuccess('')
     try {
       if (mode === 'signin') {
         await signInWithEmailAndPassword(auth, email, password)
-        setSuccess('Successfully signed in!')
       } else {
         const cred = await createUserWithEmailAndPassword(auth, email, password)
         if (name.trim() && cred.user) {
@@ -95,8 +118,8 @@ export default function SignUp() {
             console.warn('Could not update profile display name:', profileErr)
           }
         }
-        setSuccess('Account created successfully!')
       }
+      onClose()
     } catch (err) {
       setError(getFriendlyAuthError(err))
     } finally {
@@ -104,9 +127,23 @@ export default function SignUp() {
     }
   }
 
+  const switchMode = (newMode) => {
+    setMode(newMode)
+    setError('')
+  }
+
   return (
-    <div className="auth-page-container">
-      <div className="auth-modal-card">
+    <div className="auth-modal-backdrop" onClick={onClose}>
+      <div className="auth-modal-card" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          className="auth-modal-close"
+          onClick={onClose}
+          aria-label="Close modal"
+        >
+          <X size={18} />
+        </button>
+
         <div className="auth-modal-header">
           <div className="brand">
             <span>
@@ -115,13 +152,10 @@ export default function SignUp() {
             vitalis
           </div>
           <h3>
-            {mode === 'signin'
-              ? 'Sign in to your account'
-              : 'Create your Vitalis account'}
+            {mode === 'signin' ? 'Sign in to your account' : 'Create an account'}
           </h3>
           <p>
-            Securely save and review your health guidance assessments and
-            check-ins.
+            Securely save and review your health guidance assessments and check-ins.
           </p>
         </div>
 
@@ -227,13 +261,6 @@ export default function SignUp() {
             </div>
           )}
 
-          {success && (
-            <div className="auth-error" style={{ background: '#e6f4ef', borderColor: '#1a8575', color: '#126f61' }}>
-              <CheckCircle2 size={16} />
-              <span>{success}</span>
-            </div>
-          )}
-
           <button
             type="submit"
             className="auth-submit-button"
@@ -260,11 +287,7 @@ export default function SignUp() {
               <button
                 type="button"
                 className="auth-switch-link"
-                onClick={() => {
-                  setMode('signup')
-                  setError('')
-                  setSuccess('')
-                }}
+                onClick={() => switchMode('signup')}
               >
                 Sign up
               </button>
@@ -275,11 +298,7 @@ export default function SignUp() {
               <button
                 type="button"
                 className="auth-switch-link"
-                onClick={() => {
-                  setMode('signin')
-                  setError('')
-                  setSuccess('')
-                }}
+                onClick={() => switchMode('signin')}
               >
                 Sign in
               </button>
