@@ -13,7 +13,7 @@ Create a production build with `npm run build`.
 
 ## Firebase setup
 
-The supplied Firebase web configuration is in `src/firebase.js`, with Firebase Authentication and Cloud Firestore initialized and exported.
+The supplied Firebase web configuration is in `src/firebase.js`, with Firebase Authentication, Cloud Firestore, Cloud Storage, and Google Analytics initialized and exported. Both default values and optional `VITE_FIREBASE_*` environment variable overrides are supported.
 
 In the Firebase console for **ai-health-d2c5b**:
 
