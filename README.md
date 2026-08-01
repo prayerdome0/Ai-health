@@ -1,6 +1,6 @@
 # Vitalis — AI Health Companion
 
-A Firebase-backed health guidance app. It provides a professional symptom guide that highlights safety-related next steps (not disease diagnoses), a daily wellness check-in, Google sign-in, and private Firestore storage.
+A Firebase-backed health guidance app. It provides a professional symptom guide that highlights safety-related next steps (not disease diagnoses), a daily wellness check-in, Google and Email/Password sign-in, and private Firestore storage.
 
 ## Run locally
 
@@ -17,7 +17,7 @@ The supplied Firebase web configuration is in `src/firebase.js`, with Firebase A
 
 In the Firebase console for **ai-health-d2c5b**:
 
-1. Enable **Authentication → Sign-in method → Google**.
+1. Enable **Authentication → Sign-in method → Google** and **Email/Password**.
 2. Add your local and deployed domains to **Authentication → Settings → Authorized domains**.
 3. Create a Cloud Firestore database.
 4. Apply rules which ensure users can only access their own check-ins, for example:
