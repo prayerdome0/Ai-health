@@ -34,3 +34,4 @@ service cloud.firestore {
 ```
 
 > This is a wellness tool, not a diagnostic or emergency-care service.
+Demo + Admin onboarding docs ready
