@@ -21,6 +21,7 @@ import {
   X,
 } from 'lucide-react'
 import { db } from '../../firebase'
+import { friendlyFirestoreError } from '../../firestoreErrors'
 import { emergencyNumbers, seedHospitals } from '../../data/hospitals'
 
 export default function EmergencySOS({ user, onRequireAuth }) {
@@ -49,7 +50,7 @@ export default function EmergencySOS({ user, onRequireAuth }) {
         ),
       (err) => {
         console.warn('Could not load emergency contacts:', err)
-        setContactMsg('Could not load your contacts right now.')
+        setContactMsg(friendlyFirestoreError(err, 'load'))
       }
     )
     return unsub
@@ -95,7 +96,7 @@ export default function EmergencySOS({ user, onRequireAuth }) {
       setContactMsg('')
     } catch (err) {
       console.error('Could not save emergency contact:', err)
-      setContactMsg('We could not save this right now. Please try again.')
+      setContactMsg(friendlyFirestoreError(err, 'save'))
     }
   }
 
@@ -104,6 +105,7 @@ export default function EmergencySOS({ user, onRequireAuth }) {
       await deleteDoc(doc(db, 'users', user.uid, 'emergencyContacts', id))
     } catch (err) {
       console.error('Could not remove contact:', err)
+      setContactMsg(friendlyFirestoreError(err, 'delete'))
     }
   }
 

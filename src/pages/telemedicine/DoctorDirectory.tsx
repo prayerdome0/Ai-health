@@ -24,6 +24,7 @@ import {
   X,
 } from 'lucide-react'
 import { db } from '../../firebase'
+import { friendlyFirestoreError } from '../../firestoreErrors'
 import { seedDoctors, specialties } from '../../data/doctors'
 
 const timeSlots = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00']
@@ -129,7 +130,7 @@ export default function DoctorDirectory({ user, onRequireAuth }) {
       setBookMsg('')
     } catch (err) {
       console.error('Could not book appointment:', err)
-      setBookMsg('We could not save this right now. Please try again.')
+      setBookMsg(friendlyFirestoreError(err, 'save'))
     }
   }
 

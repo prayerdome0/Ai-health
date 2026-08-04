@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore'
 import { AlertTriangle, Baby, CalendarDays, NotebookPen, Sparkles, Trash2 } from 'lucide-react'
 import { db } from '../../firebase'
+import { friendlyFirestoreError } from '../../firestoreErrors'
 import { askAI } from '../../ai'
 import {
   offlineWeekTip,
@@ -98,7 +99,7 @@ export default function PregnancyTracker({ user, onRequireAuth }) {
       setNoteMsg('')
     } catch (err) {
       console.error('Could not save pregnancy note:', err)
-      setNoteMsg('We could not save this right now. Please try again.')
+      setNoteMsg(friendlyFirestoreError(err, 'save'))
     }
   }
 
@@ -107,6 +108,7 @@ export default function PregnancyTracker({ user, onRequireAuth }) {
       await deleteDoc(doc(db, 'users', user.uid, 'pregnancyNotes', id))
     } catch (err) {
       console.error('Could not delete note:', err)
+      setNoteMsg(friendlyFirestoreError(err, 'delete'))
     }
   }
 

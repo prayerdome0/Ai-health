@@ -23,6 +23,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import { db } from '../../firebase'
+import { friendlyFirestoreError } from '../../firestoreErrors'
 import {
   computeAdherence,
   FREQUENCIES,
@@ -83,7 +84,7 @@ export default function Medications({ user, onRequireAuth }) {
       },
       (err) => {
         console.warn('Could not load medications:', err)
-        setError('Your medications could not be loaded.')
+        setError(friendlyFirestoreError(err, 'load'))
       },
     )
     return unsub
@@ -177,7 +178,7 @@ export default function Medications({ user, onRequireAuth }) {
       setTimeout(() => setSuccess(''), 2500)
     } catch (err) {
       console.error('Could not add medication:', err)
-      setError('We could not save this right now. Please try again.')
+      setError(friendlyFirestoreError(err, 'save'))
     }
   }
 
@@ -187,7 +188,7 @@ export default function Medications({ user, onRequireAuth }) {
       await deleteDoc(doc(db, 'users', user.uid, 'medications', id))
     } catch (err) {
       console.error('Could not remove medication:', err)
-      setError('We could not remove that medication.')
+      setError(friendlyFirestoreError(err, 'delete'))
     }
   }
 
@@ -199,6 +200,7 @@ export default function Medications({ user, onRequireAuth }) {
       })
     } catch (err) {
       console.error('Could not update medication:', err)
+      setError(friendlyFirestoreError(err, 'save'))
     }
   }
 
@@ -234,7 +236,7 @@ export default function Medications({ user, onRequireAuth }) {
       }
     } catch (err) {
       console.error('Could not mark medication:', err)
-      setError('Could not save that. Please try again.')
+      setError(friendlyFirestoreError(err, 'save'))
     }
   }
 
@@ -254,6 +256,7 @@ export default function Medications({ user, onRequireAuth }) {
       })
     } catch (err) {
       console.error('Could not log PRN dose:', err)
+      setError(friendlyFirestoreError(err, 'save'))
     }
   }
 
