@@ -17,6 +17,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { db } from '../firebase'
+import { friendlyFirestoreError } from '../firestoreErrors'
 
 const TABS = [
   { key: 'assessments', label: 'Assessments', icon: ClipboardList },
@@ -44,6 +45,7 @@ export default function MyHealth({ user, onRequireAuth }) {
   const [error, setError] = useState('')
 
   useEffect(() => {
+    setError('')
     if (!user) {
       setData({})
       return
@@ -62,7 +64,7 @@ export default function MyHealth({ user, onRequireAuth }) {
         },
         (err) => {
           console.warn(`Could not load ${key}:`, err)
-          setError('Some records could not be loaded. Check your connection.')
+          setError(friendlyFirestoreError(err, 'load'))
         }
       )
     })
@@ -74,7 +76,7 @@ export default function MyHealth({ user, onRequireAuth }) {
       await deleteDoc(doc(db, 'users', user.uid, key, id))
     } catch (err) {
       console.error('Could not delete record:', err)
-      setError('We could not delete this right now. Please try again.')
+      setError(friendlyFirestoreError(err, 'delete'))
     }
   }
 
