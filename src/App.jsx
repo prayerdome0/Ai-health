@@ -13,6 +13,7 @@ import {
   HeartPulse,
   LogIn,
   LogOut,
+  Phone,
   ShieldCheck,
   ShieldHalf,
   Siren,
@@ -31,7 +32,7 @@ import MyHealth from './pages/MyHealth'
 import AdminPortal from './pages/admin/AdminPortal'
 import SignUp from './pages/SignUp'
 import { Link, navigate, useHashRoute } from './router'
-import { askAI, friendlySaveError } from './ai'
+import { askAI, detectUrgentContent, friendlySaveError } from './ai'
 import clinicianImage from './assets/health-professional-hero.png'
 
 const symptoms = [
@@ -194,8 +195,11 @@ export default function App() {
           } Give me practical next steps and the key points to tell a clinician. Under 130 words.`,
         },
       ],
+      onDelta: (delta) => {
+        setAiReview((prev) => prev + delta)
+      },
     })
-    setAiReview(result.reply)
+    if (!result.reply) setAiReview(result.reply)
     setAiBusy(false)
   }
 
@@ -377,6 +381,11 @@ export default function App() {
                       <h3>{assessment.level}</h3>
                     </div>
                   </div>
+                  {assessment.tone === 'urgent' && (
+                    <a className="urgent-call" href="tel:112">
+                      <Phone size={15} /> Call emergency services
+                    </a>
+                  )}
                   <p>{assessment.text}</p>
                   <strong>Topics to discuss with a clinician</strong>
                   <ul>

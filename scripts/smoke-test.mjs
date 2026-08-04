@@ -24,10 +24,62 @@ global.fetch = async (url, opts) => {
   const u = String(url)
   if (u.includes('/api/ai')) {
     if (!opts || !opts.method || opts.method === 'GET') {
-      return { ok: true, status: 200, json: async () => ({ available: true, model: 'openai', provider: 'pollinations.ai (free, no key)', free: true }) }
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          available: true,
+          model: 'openai',
+          provider: 'pollinations.ai (free, no key)',
+          free: true,
+          languages: [
+            { code: 'en', label: 'English' },
+            { code: 'es', label: 'Español' },
+          ],
+        }),
+      }
     }
-    // simulate the free provider answering through the proxy
-    return { ok: true, status: 200, json: async () => ({ reply: 'Free AI reply: rest, hydrate, and monitor your symptoms.', model: 'openai', provider: 'pollinations.ai (free, no key)', free: true }) }
+    const body = opts && opts.body ? JSON.parse(opts.body) : {}
+    const wantsStream = body.stream === true
+    const reply = 'Free AI reply: rest, hydrate, and monitor your symptoms.'
+    if (wantsStream) {
+      // Return an SSE-style stream: 3 word chunks + a [DONE] sentinel.
+      const encoder = new TextEncoder()
+      const chunks = ['Free AI reply: ', 'rest, hydrate, ', 'and monitor your symptoms.']
+      const stream = new ReadableStream({
+        start(controller) {
+          let i = 0
+          const push = () => {
+            if (i < chunks.length) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: chunks[i] })}\n\n`))
+              i++
+              setTimeout(push, 5)
+            } else {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true, reply, free: true })}\n\n`))
+              controller.enqueue(encoder.encode('data: [DONE]\n\n'))
+              controller.close()
+            }
+          }
+          push()
+        },
+      })
+      return {
+        ok: true,
+        status: 200,
+        body: stream,
+        json: async () => ({ reply, free: true }),
+      }
+    }
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        reply,
+        model: 'openai',
+        provider: 'pollinations.ai (free, no key)',
+        free: true,
+      }),
+    }
   }
   throw new Error('no network in test: ' + u)
 }
