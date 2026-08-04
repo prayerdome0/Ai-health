@@ -10,10 +10,12 @@ import {
   CheckCircle2,
   ChevronRight,
   FileHeart,
+  FileText,
   HeartPulse,
   LogIn,
   LogOut,
   Phone,
+  Pill,
   ShieldCheck,
   ShieldHalf,
   Siren,
@@ -31,6 +33,9 @@ import PregnancyTracker from './pages/womens-health/PregnancyTracker'
 import MyHealth from './pages/MyHealth'
 import AdminPortal from './pages/admin/AdminPortal'
 import SignUp from './pages/SignUp'
+import VitalsTracker from './pages/vitals/VitalsTracker'
+import Medications from './pages/medications/Medications'
+import ShareWithDoctor from './pages/share/ShareWithDoctor'
 import { Link, navigate, useHashRoute } from './router'
 import { askAI, detectUrgentContent, friendlySaveError } from './ai'
 import clinicianImage from './assets/health-professional-hero.png'
@@ -222,9 +227,12 @@ export default function App() {
         <div className="nav-links">
           {navLink(() => goHomeSection('assessment'), 'Symptom guide')}
           {navLink(() => goHomeSection('checkin'), 'Check-in')}
+          <Link to="/vitals">Vitals</Link>
+          <Link to="/medications">Meds</Link>
           <Link to="/doctors">Doctors</Link>
           <Link to="/pregnancy">Pregnancy</Link>
           <Link to="/emergency">Emergency</Link>
+          <Link to="/share">Share</Link>
           <Link to="/history">My health</Link>
           <Link to="/admin">Admin</Link>
         </div>
@@ -530,6 +538,15 @@ export default function App() {
       {route === '/emergency' && (
         <EmergencySOS user={user} onRequireAuth={login} />
       )}
+      {route === '/vitals' && (
+        <VitalsTracker user={user} onRequireAuth={login} />
+      )}
+      {route === '/medications' && (
+        <Medications user={user} onRequireAuth={login} />
+      )}
+      {route === '/share' && (
+        <ShareWithDoctor user={user} onRequireAuth={login} />
+      )}
       {route === '/history' && <MyHealth user={user} onRequireAuth={login} />}
       {route === '/admin' && <AdminPortal user={user} />}
       {route === '/signup' && <SignUp />}
@@ -542,6 +559,12 @@ export default function App() {
           vitalis
         </div>
         <div className="footer-links">
+          <Link to="/vitals">
+            <Activity size={13} /> Vitals
+          </Link>
+          <Link to="/medications">
+            <Pill size={13} /> Medications
+          </Link>
           <Link to="/doctors">
             <Stethoscope size={13} /> Doctors
           </Link>
@@ -550,6 +573,9 @@ export default function App() {
           </Link>
           <Link to="/emergency">
             <Siren size={13} /> Emergency
+          </Link>
+          <Link to="/share">
+            <FileText size={13} /> Share with doctor
           </Link>
           <Link to="/history">
             <FileHeart size={13} /> My health
