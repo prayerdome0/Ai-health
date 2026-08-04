@@ -13,6 +13,7 @@ import {
   User,
 } from 'lucide-react'
 import { db } from '../../firebase'
+import { friendlyFirestoreError } from '../../firestoreErrors'
 import {
   ageFromDob,
   BLOOD_GROUPS,
@@ -68,7 +69,7 @@ export default function Profile({ user, onRequireAuth }) {
       },
       (err) => {
         console.warn('Could not load profile:', err)
-        setError('Your profile could not be loaded.')
+        setError(friendlyFirestoreError(err, 'load'))
         setLoaded(true)
       },
     )
@@ -117,7 +118,7 @@ export default function Profile({ user, onRequireAuth }) {
       setTimeout(() => setSavedAt(null), 3000)
     } catch (err) {
       console.error('Could not save profile:', err)
-      setError('We could not save this right now. Please try again.')
+      setError(friendlyFirestoreError(err, 'save'))
     } finally {
       setSaving(false)
     }

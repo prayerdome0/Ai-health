@@ -9,6 +9,7 @@
 import { collection, doc, getDoc, getDocs, limit, orderBy, query } from 'firebase/firestore'
 import { db } from './firebase'
 import { profileToContext } from './data/profile'
+import { friendlyFirestoreError } from './firestoreErrors'
 
 export async function getAIStatus() {
   try {
@@ -184,19 +185,8 @@ export async function getUserHealthContext(user) {
 
 /** Turn a Firestore save error into a friendly, actionable message. */
 export function friendlySaveError(err) {
-  const code = err?.code || ''
   console.error('Vitalis save error:', err)
-  switch (code) {
-    case 'permission-denied':
-      return 'Saving is blocked by the database rules. The app owner needs to deploy the updated firestore.rules (see README).'
-    case 'unavailable':
-    case 'network-request-failed':
-      return 'The database is unreachable right now. Check your connection and try again.'
-    case 'unauthenticated':
-      return 'Your session expired. Please sign in again and retry.'
-    default:
-      return 'We could not save this right now. Please try again.'
-  }
+  return friendlyFirestoreError(err, 'save')
 }
 
 /* ──────────────────────────────────────────────────────────────────────────

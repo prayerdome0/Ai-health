@@ -26,6 +26,7 @@ import {
   X,
 } from 'lucide-react'
 import { db } from '../../firebase'
+import { friendlyFirestoreError } from '../../firestoreErrors'
 import { CATEGORY_LABELS, getVital, VITAL_TYPES } from '../../data/vitals'
 
 const HISTORY_LIMIT = 200
@@ -157,7 +158,7 @@ export default function VitalsTracker({ user, onRequireAuth }) {
       },
       (err) => {
         console.warn('Could not load vitals:', err)
-        setError('Some readings could not be loaded.')
+        setError(friendlyFirestoreError(err, 'load'))
       },
     )
     return unsub
@@ -254,7 +255,7 @@ export default function VitalsTracker({ user, onRequireAuth }) {
       setForm(empty)
     } catch (err) {
       console.error('Could not save vital reading:', err)
-      setError('We could not save this right now. Please try again.')
+      setError(friendlyFirestoreError(err, 'save'))
     }
   }
 
@@ -263,6 +264,7 @@ export default function VitalsTracker({ user, onRequireAuth }) {
       await deleteDoc(doc(db, 'users', user.uid, 'vitals', active, 'entries', id))
     } catch (err) {
       console.error('Could not delete reading:', err)
+      setError(friendlyFirestoreError(err, 'delete'))
     }
   }
 

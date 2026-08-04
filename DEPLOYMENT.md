@@ -14,8 +14,21 @@ React + Vite + Firebase (Auth, Firestore, Storage, FCM, Analytics) + Vercel serv
 3. Deploy. The `api/ai.js` function is picked up automatically.
 
 ## Database — Firebase
-1. Deploy `firestore.rules` (`firebase deploy --only firestore:rules`, or paste into
-   Firestore → Rules in the console).
+Vercel does **not** deploy Firestore security rules. Publish them separately
+before testing any signed-in save/load flow:
+
+```bash
+npx firebase-tools login
+npx firebase-tools deploy --only firestore:rules
+```
+
+The checked-in `.firebaserc` targets `ai-health-d2c5b`, and `firebase.json`
+points the CLI at `firestore.rules`. You can instead paste that file into
+**Firebase Console → Firestore Database → Rules** and click **Publish**.
+
+1. Add every production/preview hostname used for Google sign-in under
+   **Authentication → Settings → Authorized domains**. At minimum add
+   `ai-health-green-eta.vercel.app` for the production site.
 2. Optionally set the `role: Admin` custom claim on your account for the Admin Portal.
 3. Optionally seed `doctor_profiles` / `emergency_locations` collections (admin write).
 

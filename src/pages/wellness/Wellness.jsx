@@ -19,6 +19,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { db } from '../../firebase'
+import { friendlyFirestoreError } from '../../firestoreErrors'
 import {
   buildDayMap,
   lastNDayKeys,
@@ -95,7 +96,7 @@ export default function Wellness({ user, onRequireAuth }) {
       },
       (err) => {
         console.warn('Could not load wellness log:', err)
-        setError('Your wellness log could not be loaded.')
+        setError(friendlyFirestoreError(err, 'load'))
         setLoaded(true)
       },
     )
@@ -146,7 +147,7 @@ export default function Wellness({ user, onRequireAuth }) {
       setTimeout(() => setSuccess(''), 2500)
     } catch (err) {
       console.error('Could not save wellness:', err)
-      setError('We could not save this right now. Please try again.')
+      setError(friendlyFirestoreError(err, 'save'))
     }
   }
 
@@ -161,6 +162,7 @@ export default function Wellness({ user, onRequireAuth }) {
       )
     } catch (err) {
       console.error('Could not clear today:', err)
+      setError(friendlyFirestoreError(err, 'save'))
     }
   }
 

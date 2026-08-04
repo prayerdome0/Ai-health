@@ -13,6 +13,7 @@ import {
   Search,
 } from 'lucide-react'
 import { db } from '../../firebase'
+import { friendlyFirestoreError } from '../../firestoreErrors'
 import {
   buildCalendarCells,
   buildSymptomTrends,
@@ -61,7 +62,7 @@ export default function SymptomTrends({ user, onRequireAuth }) {
         )
       } catch (err) {
         console.warn('Could not load assessments:', err)
-        setError('Your saved assessments could not be loaded.')
+        setError(friendlyFirestoreError(err, 'load'))
       } finally {
         setLoaded(true)
       }

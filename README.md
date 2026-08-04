@@ -64,25 +64,31 @@ environment variable overrides are supported.
 In the Firebase console for **ai-health-d2c5b**:
 
 1. Enable **Authentication → Sign-in method → Google** and **Email/Password**.
-2. Add your local and deployed domains to **Authentication → Settings →
+2. Add your local and deployed domains (including
+   `ai-health-green-eta.vercel.app`) to **Authentication → Settings →
    Authorized domains**.
 3. Create a Cloud Firestore database.
 4. **Deploy the rules in `firestore.rules`** — this is what allows users to
-   save their assessments, check-ins, appointments, and contacts:
+   save their assessments, check-ins, appointments, and contacts. Vercel only
+   deploys the web app; it does not publish Firebase rules.
+
+The repository now includes `firebase.json` and `.firebaserc`, so the rules can
+be deployed directly from the project root:
 
 ```bash
-# with Firebase CLI
-firebase deploy --only firestore:rules
-# or paste the contents of firestore.rules into
-# Firestore → Rules in the Firebase console, then Publish
+npx firebase-tools login
+npx firebase-tools deploy --only firestore:rules
 ```
+
+Alternatively, paste `firestore.rules` into **Firestore → Rules** in the
+Firebase console and click **Publish**.
 
 The rules grant each signed-in user read/write access to **only their own**
 data under `users/{uid}/...` (including the `vitals/{type}/entries` subcollection, `medications`, and `medicationLogs`), public read for the emergency-location list,
 signed-in read for the doctor directory, and full access to users with the
-`Admin` custom claim (Firebase console → Authentication → Users → "Set custom
-claims" → `{"role": "Admin"}`). Without deploying these rules, saves fail with
-"We could not save this right now."
+`Admin` custom claim. Without publishing these rules, the previously deployed
+admin-only policy rejects normal users, so both record loading and saving fail
+with `permission-denied`.
 
 > This is a wellness tool, not a diagnostic or emergency-care service.
 
