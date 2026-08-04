@@ -16,9 +16,9 @@ service cloud.firestore {
 
     // Each signed-in user can read and write ONLY their own data.
     // The app writes to users/{uid}/{assessments, checkIns, appointments,
-    // emergencyContacts, pregnancyNotes, profile}, to
-    // users/{uid}/vitals/{type}/entries, to users/{uid}/medications,
-    // and to users/{uid}/medicationLogs.
+    // emergencyContacts, pregnancyNotes, medications, medicationLogs,
+    // wellness}, to users/{uid}/profile/me, and to the subcollection
+    // users/{uid}/vitals/{type}/entries.
     match /users/{userId}/{document=**} {
       allow read, write: if isOwner(userId);
     }

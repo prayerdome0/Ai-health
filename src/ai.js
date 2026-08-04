@@ -6,8 +6,9 @@
  * If the proxy or network fails, the app falls back to local, offline
  * guidance so the product still works everywhere.
  */
-import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs, limit, orderBy, query } from 'firebase/firestore'
 import { db } from './firebase'
+import { profileToContext } from './data/profile'
 
 export async function getAIStatus() {
   try {
@@ -144,6 +145,16 @@ export function offlineChatReply(language = 'en') {
 export async function getUserHealthContext(user) {
   if (!user || !db) return null
   const parts = []
+  try {
+    // Profile (one document at users/{uid}/profile/me).
+    const profileSnap = await getDoc(doc(db, 'users', user.uid, 'profile', 'me'))
+    if (profileSnap.exists()) {
+      const ctx = profileToContext(profileSnap.data())
+      if (ctx) parts.push(`Patient profile: ${ctx}`)
+    }
+  } catch {
+    /* context is optional */
+  }
   try {
     const assessmentSnap = await getDocs(
       query(collection(db, 'users', user.uid, 'assessments'), orderBy('createdAt', 'desc'), limit(1))

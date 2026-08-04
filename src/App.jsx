@@ -9,9 +9,11 @@ import {
   Bot,
   CheckCircle2,
   ChevronRight,
+  Droplet,
   FileHeart,
   FileText,
   HeartPulse,
+  LineChart as LineChartIcon,
   LogIn,
   LogOut,
   Phone,
@@ -36,6 +38,9 @@ import SignUp from './pages/SignUp'
 import VitalsTracker from './pages/vitals/VitalsTracker'
 import Medications from './pages/medications/Medications'
 import ShareWithDoctor from './pages/share/ShareWithDoctor'
+import Profile from './pages/profile/Profile'
+import Wellness from './pages/wellness/Wellness'
+import SymptomTrends from './pages/trends/SymptomTrends'
 import { Link, navigate, useHashRoute } from './router'
 import { askAI, detectUrgentContent, friendlySaveError } from './ai'
 import clinicianImage from './assets/health-professional-hero.png'
@@ -229,10 +234,13 @@ export default function App() {
           {navLink(() => goHomeSection('checkin'), 'Check-in')}
           <Link to="/vitals">Vitals</Link>
           <Link to="/medications">Meds</Link>
+          <Link to="/wellness">Wellness</Link>
           <Link to="/doctors">Doctors</Link>
           <Link to="/pregnancy">Pregnancy</Link>
           <Link to="/emergency">Emergency</Link>
+          <Link to="/trends">Trends</Link>
           <Link to="/share">Share</Link>
+          <Link to="/profile">Profile</Link>
           <Link to="/history">My health</Link>
           <Link to="/admin">Admin</Link>
         </div>
@@ -544,6 +552,15 @@ export default function App() {
       {route === '/medications' && (
         <Medications user={user} onRequireAuth={login} />
       )}
+      {route === '/wellness' && (
+        <Wellness user={user} onRequireAuth={login} />
+      )}
+      {route === '/trends' && (
+        <SymptomTrends user={user} onRequireAuth={login} />
+      )}
+      {route === '/profile' && (
+        <Profile user={user} onRequireAuth={login} />
+      )}
       {route === '/share' && (
         <ShareWithDoctor user={user} onRequireAuth={login} />
       )}
@@ -565,6 +582,9 @@ export default function App() {
           <Link to="/medications">
             <Pill size={13} /> Medications
           </Link>
+          <Link to="/wellness">
+            <Droplet size={13} /> Wellness
+          </Link>
           <Link to="/doctors">
             <Stethoscope size={13} /> Doctors
           </Link>
@@ -574,8 +594,14 @@ export default function App() {
           <Link to="/emergency">
             <Siren size={13} /> Emergency
           </Link>
+          <Link to="/trends">
+            <LineChartIcon size={13} /> Trends
+          </Link>
           <Link to="/share">
             <FileText size={13} /> Share with doctor
+          </Link>
+          <Link to="/profile">
+            <User size={13} /> Profile
           </Link>
           <Link to="/history">
             <FileHeart size={13} /> My health
