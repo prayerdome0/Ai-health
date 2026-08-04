@@ -8,9 +8,15 @@ everything you save. Google and Email/Password sign-in are supported.
 
 | Feature | Route | What it does |
 | --- | --- | --- |
-| AI assistant | chat widget (bottom-right) | Free LLM via `/api/ai` — no API key needed |
+| AI assistant | chat widget (bottom-right) | Free LLM via `/api/ai` — no API key needed. Streams responses, supports 16 languages, and pre-screens for emergency topics with a one-tap "Call emergency" banner. |
 | Symptom guide | `#/` | Safety-first guidance + optional AI review; save to your account |
 | Daily check-in | `#/` | Track how you feel day to day; saved privately |
+| Vitals tracker | `#/vitals` | Log BP, heart rate, glucose, weight, temperature, SpO₂, and sleep — with 30-day trend charts and reference ranges |
+| Medications | `#/medications` | Add medicines, daily "mark as taken" checklist, 7-day adherence ring, PRN support |
+| Daily wellness | `#/wellness` | Quick-log water, steps, and sleep with 7-day trend bars and goal percentages |
+| Symptom trends | `#/trends` | 7–90 day frequency of each saved symptom, with streak detection and a 30-day calendar |
+| Health profile | `#/profile` | DOB, sex, blood group, height/weight, conditions, allergies. Powers the AI context and the share summary. |
+| Share with doctor | `#/share` | Generate a one-page, print-friendly summary of vitals, medications, assessments and notes for your clinician |
 | Doctor directory | `#/doctors` | Browse clinicians, book appointments, video-consult flow |
 | Pregnancy tracker | `#/pregnancy` | Week-by-week milestones, notes for your clinician, weekly AI tips |
 | Emergency SOS | `#/emergency` | One-tap emergency calls, hospital finder, emergency contacts |
@@ -72,10 +78,20 @@ firebase deploy --only firestore:rules
 ```
 
 The rules grant each signed-in user read/write access to **only their own**
-data under `users/{uid}/...`, public read for the emergency-location list,
+data under `users/{uid}/...` (including the `vitals/{type}/entries` subcollection, `medications`, and `medicationLogs`), public read for the emergency-location list,
 signed-in read for the doctor directory, and full access to users with the
 `Admin` custom claim (Firebase console → Authentication → Users → "Set custom
 claims" → `{"role": "Admin"}`). Without deploying these rules, saves fail with
 "We could not save this right now."
 
 > This is a wellness tool, not a diagnostic or emergency-care service.
+
+## Tests
+
+```bash
+npm test              # smoke (jsdom) + AI upgrades + features + new features
+npm run test:smoke    # builds the app and exercises every route in jsdom
+npm run test:ai       # urgent-content detector, 14 cases across 6 languages
+npm run test:features # medication-adherence calculator, 7 cases
+npm run test:new      # profile + wellness + symptom-trends logic, 20 cases
+```
