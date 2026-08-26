@@ -101,3 +101,18 @@ npm run test:ai       # urgent-content detector, 14 cases across 6 languages
 npm run test:features # medication-adherence calculator, 7 cases
 npm run test:new      # profile + wellness + symptom-trends logic, 20 cases
 ```
+
+## USSD business service (Step 1)
+
+A standalone `*123#` USSD backend (Node + Express) lives in [`ussd/`](ussd/),
+with a browser phone simulator for free local testing:
+
+```bash
+npm run ussd        # start http://localhost:3000 (simulator + webhook)
+npm run ussd:test   # 19 automated menu-flow tests
+```
+
+The provider webhook is `POST /ussd` (Africa's Talking format, the standard
+used by MTN/Airtel/Zamtel aggregators) and is also exposed as a Vercel
+function at `/api/ussd`. See [`ussd/README.md`](ussd/README.md) for the
+6-step build plan (Firebase → accounts → admin dashboard → live short code).
