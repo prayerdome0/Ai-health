@@ -23,6 +23,7 @@ import {
   Siren,
   Sparkles,
   Stethoscope,
+  Target,
   User,
 } from 'lucide-react'
 import { auth, db, googleProvider } from './firebase'
@@ -41,6 +42,7 @@ import ShareWithDoctor from './pages/share/ShareWithDoctor'
 import Profile from './pages/profile/Profile'
 import Wellness from './pages/wellness/Wellness'
 import SymptomTrends from './pages/trends/SymptomTrends'
+import LeadFinder from './pages/leads/LeadFinder'
 import { Link, navigate, useHashRoute } from './router'
 import { askAI, detectUrgentContent, friendlySaveError } from './ai'
 import clinicianImage from './assets/health-professional-hero.png'
@@ -242,6 +244,7 @@ export default function App() {
           <Link to="/share">Share</Link>
           <Link to="/profile">Profile</Link>
           <Link to="/history">My health</Link>
+          <Link to="/leads"><Target size={14} /> Leads</Link>
           <Link to="/admin">Admin</Link>
         </div>
         <div className="nav-right">
@@ -565,6 +568,7 @@ export default function App() {
         <ShareWithDoctor user={user} onRequireAuth={login} />
       )}
       {route === '/history' && <MyHealth user={user} onRequireAuth={login} />}
+      {route === '/leads' && <LeadFinder />}
       {route === '/admin' && <AdminPortal user={user} />}
       {route === '/signup' && <SignUp />}
 
@@ -605,6 +609,9 @@ export default function App() {
           </Link>
           <Link to="/history">
             <FileHeart size={13} /> My health
+          </Link>
+          <Link to="/leads">
+            <Target size={13} /> Lead finder
           </Link>
           <Link to="/admin">
             <ShieldHalf size={13} /> Admin

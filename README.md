@@ -22,6 +22,7 @@ everything you save. Google and Email/Password sign-in are supported.
 | Emergency SOS | `#/emergency` | One-tap emergency calls, hospital finder, emergency contacts |
 | My health | `#/history` | Every saved record in one private place |
 | Admin portal | `#/admin` | Platform stats for users with the `Admin` custom claim |
+| No-site lead finder | `#/leads` | Search public directory links, import listings, filter companies without an owned website, track outreach status, and export CSV |
 | Sign up | `#/signup` | Standalone create-account / sign-in page |
 
 ## Run locally
@@ -95,12 +96,27 @@ with `permission-denied`.
 ## Tests
 
 ```bash
-npm test              # smoke (jsdom) + AI upgrades + features + new features
+npm test              # smoke (jsdom) + AI upgrades + features + new features + leads
 npm run test:smoke    # builds the app and exercises every route in jsdom
 npm run test:ai       # urgent-content detector, 14 cases across 6 languages
 npm run test:features # medication-adherence calculator, 7 cases
 npm run test:new      # profile + wellness + symptom-trends logic, 20 cases
+npm run test:leads    # no-site lead parsing, filtering, merging, search links, and CSV export
 ```
+
+## No-site lead finder
+
+The lead workspace at `#/leads` is a transparent research and follow-up tool.
+Enter a business type and location to open searches on Google Maps, Yelp, or
+LinkedIn, then paste a CSV/TSV export or add a public listing manually. Rows
+with a blank website, a placeholder, or only a social/directory profile are
+kept; rows with an owned website are skipped. Leads are stored in the current
+browser and can be exported as `no-site-leads.csv`.
+
+The app does **not** log in to, scrape, or bypass protections on third-party
+platforms. Use the platforms' permitted exports and public business details,
+and follow each service's terms and applicable privacy laws when doing outreach.
+
 
 ## USSD business service (Step 1)
 

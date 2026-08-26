@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 
 /**
  * Minimal hash-based router (no extra dependencies).
- * Routes look like: #/, #/doctors, #/pregnancy, #/emergency, #/history, #/admin, #/signup
+ * Routes look like: #/, #/doctors, #/pregnancy, #/emergency, #/history, #/leads, #/admin, #/signup
  */
 
 function readRoute() {
