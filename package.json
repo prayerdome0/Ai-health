@@ -11,7 +11,8 @@
     "test:ai": "node scripts/test-ai-upgrades.mjs",
     "test:features": "node scripts/test-features.mjs",
     "test:new": "node scripts/test-new-features.mjs",
-    "test": "npm run test:smoke && npm run test:ai && npm run test:features && npm run test:new",
+    "test:leads": "node scripts/test-leads.mjs",
+    "test": "npm run test:smoke && npm run test:ai && npm run test:features && npm run test:new && npm run test:leads",
     "ussd": "npm run dev --prefix ussd",
     "ussd:test": "npm test --prefix ussd"
   },

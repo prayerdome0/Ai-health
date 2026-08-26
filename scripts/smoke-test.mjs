@@ -119,6 +119,7 @@ try {
     ['/profile', 'Your health profile'],
     ['/share', 'Bring your data to your visit'],
     ['/history', 'Your records'],
+    ['/leads', 'Find businesses that need a website'],
     ['/admin', 'Admin access required'],
     ['/signup', 'Create your Vitalis account'],
   ]) {
