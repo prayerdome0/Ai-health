@@ -11,7 +11,9 @@
     "test:ai": "node scripts/test-ai-upgrades.mjs",
     "test:features": "node scripts/test-features.mjs",
     "test:new": "node scripts/test-new-features.mjs",
-    "test": "npm run test:smoke && npm run test:ai && npm run test:features && npm run test:new"
+    "test": "npm run test:smoke && npm run test:ai && npm run test:features && npm run test:new",
+    "ussd": "npm run dev --prefix ussd",
+    "ussd:test": "npm test --prefix ussd"
   },
   "dependencies": {
     "firebase": "^11.0.2",

@@ -1,0 +1,19 @@
+{
+  "name": "ussd-business-service",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "USSD business service (*123#) — Step 1: backend + menu system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/engine.test.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
