@@ -1,0 +1,110 @@
+user: i think i am getting a cold. what should i do?
+ai: rest, drink fluids and be patient, since most colds clear in seven to ten days. warm drinks, honey for a cough and saline nasal rinses ease symptoms. wash your hands often so you do not share it. antibiotics do not help against colds, which are viral.
+
+user: how do i tell a cold from the flu?
+ai: colds creep in with sneezing and a runny nose and stay mild. flu hits fast: fever, chills, deep body aches and exhaustion that sends you to bed. flu vaccines each autumn are the best protection, and antivirals work best in the first two days if you are high risk.
+
+user: when should i see a doctor about a fever?
+ai: adults should get checked for fever above thirty nine point four celsius that lasts more than three days, or any fever with stiff neck, trouble breathing, confusion, rash or severe dehydration. babies under three months with any fever need care immediately.
+
+user: how do i treat a fever at home?
+ai: rest, drink plenty of fluids and use a light blanket rather than bundling up. paracetamol or ibuprofen can reduce fever and aches if you can take them. fever itself is part of the immune response, so treat the discomfort, not the number.
+
+user: my throat hurts. what helps?
+ai: warm salt water gargles, honey in warm tea, and lozenges soothe most sore throats. stay hydrated and rest your voice. see a doctor if you have trouble swallowing or breathing, white patches with high fever, or symptoms lasting more than a week.
+
+user: how long am i contagious with a cold?
+ai: usually you can spread a cold from a day before symptoms start until about five days in. wash hands often, cough into your elbow, and rest at home in the first days, both to recover and to protect others.
+
+user: what actually helps a cough?
+ai: honey, at a spoonful or stirred into warm water, is one of the few remedies with real evidence for night coughs, but never give honey to babies under one. warm fluids, a humidifier and elevating your head at night also help. smoking makes coughs worse and longer.
+
+user: do i need antibiotics for a sinus infection?
+ai: not always. most sinus infections are viral and clear within ten days. steam, saline rinses and decongestants for a few days help. see a doctor if symptoms worsen after improving, or last beyond ten days, since that can suggest a bacterial infection.
+
+user: i keep getting headaches at work. why?
+ai: the usual suspects are screen strain, dehydration, skipped meals, poor sleep and tension in the neck and shoulders. try the basics for a week: water on your desk, breaks every thirty minutes, screen at eye level and a regular lunch. frequent headaches still deserve a doctor visit.
+
+user: how do i get rid of a tension headache?
+ai: hydrate, step away from the screen, gently stretch your neck and roll your shoulders, and massage your temples. a warm shower or a cold pack on the forehead helps some people. over the counter painkillers work, but using them more than ten days a month can cause rebound headaches.
+
+user: what are warning signs with a headache?
+ai: seek care urgently for a sudden thunderclap headache, headache with fever and stiff neck, weakness or slurred speech, vision changes, or the worst headache of your life. those need same-day medical attention, not home remedies.
+
+user: my stomach is upset. what should i eat?
+ai: keep it simple and gentle: small sips of water or oral rehydration solution first, then bland foods like toast, rice, bananas or crackers. avoid dairy, greasy food, caffeine and alcohol until you feel better. rest the gut, then rebuild slowly.
+
+user: how do i avoid getting sick on planes?
+ai: wash or sanitize hands before eating and after touching shared surfaces, avoid touching your face, stay hydrated, and turn the air vent so air flows in front of you. moving around hourly also helps prevent stiff legs and, rarely, blood clots.
+
+user: how should i care for a minor burn?
+ai: run cool water over it for ten to twenty minutes, then cover loosely with a clean, non-fluffy dressing. skip ice, butter and toothpaste. see a doctor for burns larger than your palm, on the face or joints, or with blisters and broken skin.
+
+user: what is the right way to wash hands?
+ai: soap and water for twenty seconds, including between fingers, thumbs and under nails, then dry well. the twenty seconds is real: it takes that long for soap to lift germs and oils. sanitize when there is no sink, but soapy water beats gel after the bathroom.
+
+user: i cut my finger, what should i do?
+ai: press a clean cloth firmly on it for ten minutes without peeking, raise the hand above heart level, then clean with water and cover with a plaster. get help if the cut is deep, gaps open, will not stop bleeding after fifteen minutes of pressure, or shows signs of infection.
+
+user: how do i treat a sprained ankle?
+ai: rest it, ice it fifteen minutes a few times a day, use a compression bandage and keep it elevated. gentle movement as pain allows speeds recovery. if you cannot bear weight, the ankle looks deformed or swelling is severe, get an x-ray to rule out a fracture.
+
+user: when is vomiting serious?
+ai: get medical help if vomiting lasts more than a day, you cannot keep any fluids down for many hours, there is blood, severe belly pain, signs of dehydration like dark urine and dizziness, or vomiting after a head injury. for babies, dehydration develops faster.
+
+user: how do i prevent food poisoning?
+ai: wash hands and boards between raw meat and ready-to-eat food, refrigerate leftovers within two hours, reheat until steaming, and never eat food that smells off, whatever the date says. the danger zone is room temperature, and two hours is the limit.
+
+user: my eyes feel tired and dry from screens. what can i do?
+ai: follow the twenty twenty twenty rule: every twenty minutes look at something twenty feet away for twenty seconds. blink deliberately, lower your screen slightly so eyes are not wide open, and use preservative-free artificial tears. persistent pain or vision changes need an eye doctor.
+
+user: what should i do about back pain?
+ai: most low back pain improves within a few weeks. keep moving gently rather than resting in bed, use heat, and do easy walks. avoid heavy lifting with a rounded back. numbness in the legs, loss of bladder control or fever with back pain means see a doctor now.
+
+user: is it bad to take painkillers often?
+ai: occasional use as directed is fine for most people, but regular use has risks: stomach irritation with anti-inflammatories, liver issues with too much paracetamol, and rebound headaches from frequent use. if you need them most days, find the cause with a doctor instead.
+
+user: how do i know if i have allergies or a cold?
+ai: allergies bring itchy eyes, sneezing fits and clear mucus that lasts weeks and follows patterns like pollen season or a dusty room. colds peak in a few days, may include fever and body aches, and clear within two weeks. antihistamines help allergies but do little for colds.
+
+user: what helps with puffy eyes in the morning?
+ai: usually salt and sleep. reduce salty food in the evening, sleep slightly propped up, and try a cool compress for a few minutes. allergies can add to puffiness too, so an antihistamine may help if you are itchy as well.
+
+user: i feel dizzy when i stand up. what is going on?
+ai: that is often postural drops in blood pressure, made worse by dehydration, missed meals or some medications. rise slowly, drink more water and eat regularly. if it keeps happening, or comes with fainting or chest symptoms, see a doctor.
+
+user: how can i protect my hearing?
+ai: keep headphone volume around sixty percent and give your ears quiet breaks, use earplugs at concerts and when mowing the lawn, and never poke cotton buds into the ear canal. hearing damage is permanent, and it adds up quietly over years.
+
+user: what is the fastest way to recover from a workout injury?
+ai: relative rest from painful activity, not total stillness. ice early on for swelling, then gentle movement as tolerated, and rebuild strength gradually. a physiotherapist is worth it if pain lasts more than a week or two. do not train through sharp joint pain.
+
+user: should i pop a blister?
+ai: no, leave it intact, since the fluid keeps the skin underneath clean and protected. cover it with a soft plaster and let it heal. only a medical professional should drain large or very painful blisters, in a sterile way.
+
+user: how much vitamin d do i need?
+ai: most adults need around fifteen micrograms, six hundred iu, a day. your skin makes vitamin d from sunlight, but in winter, at high latitudes, or with mostly indoor living, many people run low. fatty fish and fortified foods help. a blood test can tell if you need a supplement.
+
+user: i pulled a muscle in my back. what now?
+ai: apply heat or ice for fifteen minutes a few times a day, keep moving gently with short walks, and avoid heavy lifting for a few days. gentle stretches like knees to chest help. see a doctor if pain shoots down a leg, or you get numbness or bladder changes.
+
+user: how do i take care of a feverish child at home?
+ai: keep fluids coming in small sips, dress lightly, keep the room comfortable, and give paracetamol or ibuprofen dosed by weight for discomfort. watch energy levels more than the number on the thermometer. a doctor should see infants under three months with any fever, and any child who is unusually drowsy, has a rash, trouble breathing or refuses fluids.
+
+user: is it okay to exercise when i am sick?
+ai: use the neck rule. symptoms above the neck, like a runny nose or mild sore throat, allow light movement. below the neck, like chest congestion, body aches or fever, mean rest. never train hard with a fever, since it stresses the heart.
+
+user: how do i prevent motion sickness?
+ai: sit where movement is mildest, like over the wing on a plane or the front seat of a car, look at the horizon, skip heavy meals and alcohol before travel, and keep fresh air moving. ginger and travel sickness tablets help many people taken before departure.
+
+user: what helps chapped lips and dry skin in winter?
+ai: a plain fragrance-free balm through the day, a humidifier in the bedroom, lukewarm instead of hot showers, and moisturizer within a minute of washing. drinking enough water helps too. cracked skin at the mouth corners can signal a deficiency worth checking.
+
+user: my wounds heal slowly. should i worry?
+ai: slow healing can come from diabetes, poor circulation, low protein intake, smoking or persistent friction on the wound. keep wounds clean and moist with a plaster, eat enough protein, and see a doctor if a wound has not improved after two weeks or looks infected.
+
+user: how do i deal with constipation?
+ai: more fiber, more water, more walking. prunes, kiwi, oats and beans are gentle helpers, and going to the toilet at the same time each morning trains the routine. see a doctor for sudden changes, blood, or severe pain, and never strain hard.
+
+user: what are signs of infection in a wound?
+ai: watch for increasing redness spreading from the wound, warmth, swelling, throbbing pain, pus, or red streaks running toward the heart, plus fever. clean wounds need medical attention when these appear, and earlier if you have diabetes or immune problems.

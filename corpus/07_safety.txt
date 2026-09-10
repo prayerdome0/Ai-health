@@ -1,0 +1,59 @@
+user: i have chest pain right now
+ai: chest pain can be an emergency. if it is heavy, crushing, spreads to your arm, jaw or back, or comes with sweating, nausea or shortness of breath, call your local emergency number immediately and do not drive yourself. if a doctor has already told you otherwise and it is mild, still get it checked today. i am a tiny educational model, not a doctor.
+
+user: i cannot breathe properly
+ai: trouble breathing is an emergency. call your local emergency number now, sit upright, loosen tight clothing and stay calm while help comes. do not wait to see if it passes on its own.
+
+user: i think i took too many pills
+ai: this is urgent. call your local emergency number or poison control right away, and keep the packaging with you. do not make yourself vomit unless told to by a professional. please reach out now, help is one call away.
+
+user: i feel like hurting myself
+ai: i am really glad you told me, and i want you to be safe. please contact a crisis line or someone you trust right now. you deserve support, and trained people can help tonight. if you are in immediate danger, call your local emergency number. you are not alone, even when it feels that way.
+
+user: should i go to the hospital?
+ai: go or call for urgent help if you have chest pain, trouble breathing, one-sided weakness or slurred speech, a seizure, severe bleeding, a head injury with confusion, or a fever with stiff neck. when in doubt, call your local emergency number or a nurse hotline and let a professional judge. my tips are education only.
+
+user: i fainted just now. what does that mean?
+ai: a faint after standing up fast, heat or the sight of blood is often harmless, but any fainting deserves a same-day medical check to rule out heart causes, especially if it came without warning, during exercise, or with palpitations. sit or lie down now and drink water if you feel it returning.
+
+user: what do i do about severe bleeding?
+ai: press hard on the wound with a clean cloth and do not let go, raise the limb above heart level if you can, and call your local emergency number if bleeding soaks through or spurts. keep adding cloths on top rather than removing them. stay with the person and keep them warm.
+
+user: someone is having a seizure, what do i do?
+ai: clear the area of hard objects, cushion the head, and time the seizure. do not hold them down or put anything in their mouth. after it ends, roll them onto their side in the recovery position. call emergency services if it lasts more than five minutes, repeats, or it is their first seizure.
+
+user: i think my child swallowed something
+ai: call poison control or your local emergency number immediately and keep the container or medicine with you for the call. do not make them vomit unless professionals tell you to. speed matters, so make the call first, questions after.
+
+user: how do i know a stroke?
+ai: remember fast: face drooping on one side, arm weakness or drift, speech slurred or strange, time to call your local emergency number immediately. note when symptoms started, since treatments work within hours. even if symptoms pass, still call, because a mini stroke is a warning.
+
+user: i am having a panic attack
+ai: this feels frightening, but it will pass, usually within ten to twenty minutes. breathe out slowly and longer than you breathe in, feel your feet on the floor, and name five things you can see around you. cold water on your wrists or face can help too. if this is new or keeps happening, please talk to a doctor so other causes are ruled out and you get real support.
+
+user: my medicine makes me feel weird. should i stop taking it?
+ai: do not stop suddenly on your own, since some medicines need tapering and stopping can be risky. write down exactly what you feel and call your doctor or pharmacist today for advice. they can adjust the dose or switch, and that is a normal part of treatment, not a failure.
+
+user: i found a lump. should i panic?
+ai: do not panic, but do not wait either. most lumps are benign, and doctors would always rather check a harmless one than a late one. book an appointment this week, note when you found it and whether it changes, and let a professional examine it. early checks save lives.
+
+user: can you tell me what disease i have?
+ai: i genuinely cannot diagnose, and guessing could be harmful. i can share general information about symptoms and healthy habits, but only a clinician who can examine you and order tests can tell you what is going on. please describe your symptoms to a doctor, nurse line or pharmacist.
+
+user: my blood pressure reading was high today
+ai: a single high reading can come from stress, caffeine, a full bladder or a cuff issue, so rest five minutes and measure again. if it stays above one forty over ninety, contact your doctor, especially with headaches, chest discomfort or vision changes. call emergency services for readings above one eighty over one twenty with symptoms. keep a log of readings to show your doctor.
+
+user: i think i have a food allergy
+ai: do not experiment alone. see a doctor or allergist for proper testing before cutting major foods, since unbalanced diets carry their own risks. if you have ever had swelling of lips or throat, hives with breathing trouble or dizziness after eating, that can be anaphylaxis and needs an emergency plan and possibly an adrenaline autoinjector prescribed by a doctor.
+
+user: i feel dizzy and my heart is racing
+ai: sit or lie down right away so you cannot fall. breathe slowly, and if it passes quickly after standing up fast, dehydration may be the cause, so drink water. if palpitations last more than a few minutes, come with chest pain, fainting or shortness of breath, or keep happening, get medical care today.
+
+user: my baby has a fever. what do i do?
+ai: babies under three months with any fever of thirty eight celsius or more need a doctor immediately, no home treatment first. for older babies, fluids in small frequent sips, light clothing, and paracetamol dosed by weight for discomfort help, and a doctor should see any baby who is unusually sleepy, breathing fast, refusing feeds, has a rash that does not fade under a glass, or has had fever more than a day.
+
+user: i overdrew my energy and feel completely burned out
+ai: burnout is your body sending an invoice, and it does not accept payment in willpower. this week, protect sleep first, drop everything non-essential, and take at least one real day fully off. then look at the schedule that caused this and change one structural thing, like a hard stop time or one fewer commitment. if the exhaustion includes hopelessness, please loop in a doctor or therapist, because real recovery deserves real support.
+
+user: should i exercise with this injury?
+ai: do not train through sharp pain, swelling or instability, since that usually deepens the injury. keep moving the rest of your body gently, and let the injured part rest, ice and elevate as needed. a physiotherapist or doctor should clear you before returning to full training, especially for head injuries, where any concussion symptoms mean stop immediately.

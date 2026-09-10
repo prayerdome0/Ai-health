@@ -1,121 +1,118 @@
-# LocalMind
+# Pulse ⚡
 
-A complete, runnable local AI system. Auto-detects your hardware, picks the
-right model, and gives you chat + hybrid RAG + a tool-using agent + memory +
-web UI + an OpenAI-compatible server. **Zero API keys, zero cloud calls at
-runtime.**
+**A real artificial neural network — defined, trained and served entirely by this
+repository. No APIs. No API keys. No cloud. No model downloads.**
+
+Pulse is a small decoder-only transformer (the GPT architecture) implemented from
+scratch in Python. Every piece is in this repo:
+
+- a **reverse-mode automatic differentiation engine** (`ai/autodiff.py`) —
+  backpropagation is derived and computed by code you can read
+- a **GPT-style transformer**: multi-head causal self-attention, GELU MLPs,
+  layer norm, residual stream, tied embeddings (`ai/model.py`, `ai/train.py`)
+- an **AdamW optimizer** with gradient clipping, warmup and cosine decay
+- a **character-level tokenizer** learned from the bundled corpus
+- a **~65 KB hand-written health & conversation corpus** it learns from
+- a **terminal chat** and a **web chat UI** served by Python's standard library
+
+Training happens on your CPU in ~20 minutes. The trained network is checked
+in at `checkpoint/pulse.npz` (~2.2 MB), so everything works out of the box —
+and you can wipe it and retrain it yourself with one command.
+
+```bash
+pip install -r requirements.txt      # just numpy (optional but recommended)
+
+python main.py chat                  # chat in the terminal
+python main.py ui                    # chat in the browser (http://localhost:8000)
+python main.py train                 # retrain the network from ./corpus (~15 min CPU)
+python main.py selftest              # 19 checks: gradients, causality, inference…
+python main.py info                  # architecture + checkpoint facts
+```
 
 ```
 .
-├── requirements.txt
-├── main.py                 # single entrypoint: doctor | pull | chat | ui | ingest | ask | agent | serve
-├── core/
-│   ├── __init__.py
-│   ├── config.py           # hardware detection + auto model selection + settings
-│   ├── llm.py              # backend abstraction: Ollama / llama.cpp / Transformers
-│   ├── store.py            # hybrid vector + BM25 store (numpy, no external DB)
-│   ├── ingest.py           # PDF/MD/code/txt/docx → chunks → index
-│   ├── rag.py              # retrieve → rerank → grounded answer w/ citations
-│   ├── tools.py            # jailed filesystem, python, shell, calc, memory
-│   ├── agent.py            # ReAct loop with robust JSON parsing
-│   └── memory.py           # rolling summary + long-term fact store
-├── ui/app.py               # Gradio chat UI (streaming, RAG/agent toggles)
-├── server/openai_api.py    # /v1/chat/completions, drop-in OpenAI-compatible
-├── firebase-config.json    # public Firebase web config (kept from the old app)
-└── scripts/
-    ├── mock_ollama.py      # fake local Ollama API — try the whole system with no model download
-    └── smoke.py            # end-to-end self-test (chat, RAG, agent, API)
+├── main.py               # entrypoint: chat | ui | train | say | info | selftest | benchmark
+├── ai/
+│   ├── autodiff.py       # micro reverse-mode autodiff engine + AdamW (from scratch)
+│   ├── model.py          # GPT architecture, KV-cache inference, checkpoint I/O
+│   ├── train.py          # batched forward/backward, training loop
+│   ├── ops.py            # dual math backend: numpy OR pure-python (zero deps)
+│   ├── tokenizer.py      # character-level tokenizer
+│   ├── data.py           # corpus loading + batching
+│   ├── chat.py           # prompt building, sampling, reply cleaning, REPL
+│   └── webui.py          # stdlib http server for the web UI
+├── ui/index.html         # single-file chat page (vanilla JS, no build step)
+├── corpus/*.txt          # the entire "knowledge" of the model, human-readable
+├── tools/build_corpus.py # paraphrase-augmentation for the hand-written corpus
+├── checkpoint/pulse.npz  # trained weights (float16) + vocab + config
+└── tests/test_all.py     # gradient checks, causality, backend equivalence, e2e
 ```
 
-## Quickstart
+## Why this is a "real" AI
 
-```bash
-pip install -r requirements.txt
+Pulse is not a chatbot script and not a wrapper around someone else's model.
+It is a neural network: 1,166,080 floating-point parameters arranged as a
+transformer, initialized to random noise and **learned by gradient descent**.
+Run `python main.py train` and you can watch the loss fall from 7.96 (random
+over a 2,784-word vocabulary) as backpropagation reshapes every weight:
 
-# 1. What can my machine run?
-python main.py doctor
-
-# 2. Get the model (auto-picked for your hardware)
-curl -fsSL https://ollama.com/install.sh | sh   # if doctor says Ollama missing
-python main.py pull
-
-# 3. Use it
-python main.py chat                     # terminal
-python main.py ui                       # http://127.0.0.1:7860
-python main.py ingest ~/Documents       # index your files
-python main.py ask "what's our rollback procedure?"
-python main.py agent "count lines of python in ./workspace and plot a histogram"
-python main.py serve                    # OpenAI-compatible at :8000/v1
+```
+  step     loss      val        lr    tok/s  t
+     0    7.959    7.956   0.00003      928  2s
+   300    2.642    3.573   0.00242    2,422  191s
+   850    0.334    1.257   0.00153    2,433  537s
+  1700    0.122    0.689   0.00014    2,437  1072s
 ```
 
-Point **any** OpenAI client at it — Continue.dev, Cursor, LangChain, curl:
+The self-test proves the machinery is real:
 
-```bash
-curl http://127.0.0.1:8000/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{"model":"local-rag","messages":[{"role":"user","content":"summarize my docs on auth"}]}'
-```
+- **backprop matches finite differences** — every gradient of the loss with
+  respect to every weight is checked numerically
+- **attention is causal** — changing future tokens cannot change past predictions
+- **three independent implementations agree** — the batched training forward,
+  the KV-cache inference path, and a pure-Python fallback (no numpy at all)
+  produce the same logits
+- **it learns** — on a toy corpus the loss drops fast, end to end
 
-### No GPU / no model yet? Try the mock backend
+## Design notes
 
-`scripts/mock_ollama.py` speaks the Ollama HTTP protocol on
-`127.0.0.1:11434` with a tiny deterministic model. With it running, every
-command above works immediately (chat, RAG, agent, UI, API) — useful for
-developing the app before downloading real weights, or for CI:
-
-```bash
-python scripts/mock_ollama.py &        # terminal 1
-python main.py ui                      # terminal 2
-python scripts/smoke.py                # end-to-end self-test (starts its own mock)
-```
-
-## What makes it "powerful" (design notes)
-
-| Decision | Why it beats the naive version |
+| Decision | Why |
 |---|---|
-| **RRF hybrid retrieval** (dense + BM25) | Dense misses exact identifiers/error codes; BM25 misses paraphrase. Fusing them typically lifts recall 15–30% over either alone. |
-| **Cross-encoder rerank** | Retrieve 30 → rerank → keep 6. Usually the single biggest RAG quality jump for a few hundred ms. |
-| **Query expansion** | One cheap LLM rewrite fixes vocabulary mismatch between your question and the document's jargon. |
-| **numpy store, no DB** | No Chroma/SQLite version hell, no daemon. Handles ~100k chunks comfortably in RAM. Swap to FAISS/HNSW only when you exceed that. |
-| **Brace-balanced JSON parser** | Small models emit prose around their JSON and nest braces inside strings. Regex fails; this doesn't. |
-| **`stop=["OBSERVATION:"]`** | Stops the model hallucinating its own tool results — the #1 local-agent failure mode. |
-| **Two-tier memory** | Rolling LLM summary keeps context bounded; the fact store is vector-searched so old details resurface on demand. |
-| **Workspace jail + denylist** | Path resolution check blocks `../` escapes; regex blocks the classic destructive commands. |
-| **Backend abstraction** | Same code runs on Ollama, llama.cpp, or Transformers — swap `backend` in `data/config.json`. |
+| Word-level tokenizer | The vocabulary is simply the words observed in the corpus — no merges file, no downloads. Predicting whole words instead of characters is what lets a model this small produce coherent sentences at all. |
+| Tied input/output embeddings | Halves the biggest parameter block and acts as a built-in regularizer at this scale. |
+| KV-cache inference | Each generated character costs the same, regardless of context length. |
+| Pure-Python backend | With zero third-party packages installed, inference still runs (`python main.py chat` after uninstalling numpy) — just slowly. numpy is only *required* for training. |
+| Corpus in plain text | The model's entire world-view is auditable in `corpus/`. Edit it, retrain, and the model changes. `tools/build_corpus.py` multiplies each hand-written pair into paraphrased variants — same facts, many surface forms — which is what keeps a small model from collapsing into rote memorization. |
+| Best-val checkpointing | Training keeps the checkpoint with the lowest validation loss, protecting against overfitting a small corpus. |
+| stdlib web server | `python main.py ui` has no Flask/FastAPI/Gradio dependency. One process, one file of HTML. |
 
-**Tuning knobs:**
+## Honest limitations
 
-```bash
-python main.py config --set final_k=10 retrieve_k=50 temperature=0.3
-python main.py config --set model=qwen2.5-coder:32b   # coding specialist
-python main.py config --set use_reranker=false        # faster, slightly worse
-python main.py config --set allow_shell=false         # lock down the agent
-```
+Pulse has ~1.17M parameters and ~55K training tokens — a large model has
+billions of parameters and trillions of tokens. Expect a small, charming,
+sometimes confused assistant: good at the *shape* of health conversations and
+its corpus's advice, occasionally answering a neighbouring question instead of
+yours, and capable of nonsense. Treat everything it says as educational, never
+as medical advice (it will usually remind you of this itself — the corpus is
+written that way on purpose).
 
-## Firebase configuration
+Scaling levers, all already supported by the code:
 
-`firebase-config.json` holds the public web-app configuration for Firebase
-project **`ai-health-d2c5b`** (kept when the previous app was removed). These
-are client-safe identifiers, not credentials — access is controlled by
-Firestore Security Rules / Firebase Auth. A service-account private key is
-**not** included and should never be committed.
+- **More text**: drop `.txt` files into `corpus/` and retrain.
+- **Bigger model**: `ai/config.py` → `d_model`, `n_layers`, `block_size`.
+- **Longer training**: `python main.py train --steps 4000 --resume`.
 
-## Deployment
+## Requirements
 
-LocalMind itself is **local-first** — the chat, RAG and agent run as
-long-running Python processes on your machine, which Vercel's serverless
-platform cannot host. The `site/` folder is a static landing page that
-Vercel deploys without a build step (`vercel.json` sets `buildCommand: null`
-and serves `site/`), so the repo's connected Vercel project keeps passing
-deployments and PR checks. To host the actual app on a server, use a
-platform that runs persistent Python processes (Render, Railway, Fly.io,
-or any VPS) — add a `Dockerfile` or run `python main.py ui` directly.
+- Python 3.10+
+- numpy (training; strongly recommended for inference)
+- ~1 GB RAM for training, ~100 MB for chatting
 
-## Natural next steps
+Optional: with numpy uninstalled, chat still works via the pure-Python backend
+(`~1–2 s per token` — proof of self-sufficiency, not a recommendation).
 
-- **Voice** — faster-whisper STT + Piper TTS, full offline duplex loop
-- **Vision** — swap in Qwen2.5-VL / Llama-3.2-Vision for screenshots, diagrams, scanned PDFs
-- **QLoRA fine-tune pipeline** — harvest good conversations from this system → train an adapter → hot-swap it
-- **Speculative decoding** — 2–3× throughput using a 0.5B draft model
-- **Multi-agent** — planner/researcher/critic with a shared blackboard
-- **GraphRAG** — entity-relation graph over your corpus for multi-hop questions
+## Privacy
+
+Pulse runs on your machine and talks only to your machine. There is no server,
+no telemetry, no account, no network access in the code paths at all. Chats are
+not stored anywhere.

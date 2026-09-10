@@ -4,14 +4,8 @@ __pycache__/
 .venv/
 venv/
 
-# LocalMind runtime data (indexes, settings, agent workspace, memory)
+# runtime scratch
 data/
-workspace/
 
-# Node / misc
-node_modules/
-dist/
-.env
-.env.*
-!.env.example
+# OS / editor
 .DS_Store
