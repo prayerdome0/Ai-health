@@ -1,1 +1,0 @@
-telemedicine_appointments, consultations, prescriptions, doctor_profiles

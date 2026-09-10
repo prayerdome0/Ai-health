@@ -1,118 +1,121 @@
-# Vitalis — AI Health Companion
+# LocalMind
 
-A Firebase-backed health guidance app with a real AI assistant, emergency SOS,
-telemedicine booking, a pregnancy tracker, and private Firestore storage for
-everything you save. Google and Email/Password sign-in are supported.
+A complete, runnable local AI system. Auto-detects your hardware, picks the
+right model, and gives you chat + hybrid RAG + a tool-using agent + memory +
+web UI + an OpenAI-compatible server. **Zero API keys, zero cloud calls at
+runtime.**
 
-## Features
+```
+.
+├── requirements.txt
+├── main.py                 # single entrypoint: doctor | pull | chat | ui | ingest | ask | agent | serve
+├── core/
+│   ├── __init__.py
+│   ├── config.py           # hardware detection + auto model selection + settings
+│   ├── llm.py              # backend abstraction: Ollama / llama.cpp / Transformers
+│   ├── store.py            # hybrid vector + BM25 store (numpy, no external DB)
+│   ├── ingest.py           # PDF/MD/code/txt/docx → chunks → index
+│   ├── rag.py              # retrieve → rerank → grounded answer w/ citations
+│   ├── tools.py            # jailed filesystem, python, shell, calc, memory
+│   ├── agent.py            # ReAct loop with robust JSON parsing
+│   └── memory.py           # rolling summary + long-term fact store
+├── ui/app.py               # Gradio chat UI (streaming, RAG/agent toggles)
+├── server/openai_api.py    # /v1/chat/completions, drop-in OpenAI-compatible
+├── firebase-config.json    # public Firebase web config (kept from the old app)
+└── scripts/
+    ├── mock_ollama.py      # fake local Ollama API — try the whole system with no model download
+    └── smoke.py            # end-to-end self-test (chat, RAG, agent, API)
+```
 
-| Feature | Route | What it does |
-| --- | --- | --- |
-| AI assistant | chat widget (bottom-right) | Free LLM via `/api/ai` — no API key needed. Streams responses, supports 16 languages, and pre-screens for emergency topics with a one-tap "Call emergency" banner. |
-| Symptom guide | `#/` | Safety-first guidance + optional AI review; save to your account |
-| Daily check-in | `#/` | Track how you feel day to day; saved privately |
-| Vitals tracker | `#/vitals` | Log BP, heart rate, glucose, weight, temperature, SpO₂, and sleep — with 30-day trend charts and reference ranges |
-| Medications | `#/medications` | Add medicines, daily "mark as taken" checklist, 7-day adherence ring, PRN support |
-| Daily wellness | `#/wellness` | Quick-log water, steps, and sleep with 7-day trend bars and goal percentages |
-| Symptom trends | `#/trends` | 7–90 day frequency of each saved symptom, with streak detection and a 30-day calendar |
-| Health profile | `#/profile` | DOB, sex, blood group, height/weight, conditions, allergies. Powers the AI context and the share summary. |
-| Share with doctor | `#/share` | Generate a one-page, print-friendly summary of vitals, medications, assessments and notes for your clinician |
-| Doctor directory | `#/doctors` | Browse clinicians, book appointments, video-consult flow |
-| Pregnancy tracker | `#/pregnancy` | Week-by-week milestones, notes for your clinician, weekly AI tips |
-| Emergency SOS | `#/emergency` | One-tap emergency calls, hospital finder, emergency contacts |
-| My health | `#/history` | Every saved record in one private place |
-| Admin portal | `#/admin` | Platform stats for users with the `Admin` custom claim |
-| Sign up | `#/signup` | Standalone create-account / sign-in page |
-
-## Run locally
+## Quickstart
 
 ```bash
-npm install
-npm run dev
+pip install -r requirements.txt
+
+# 1. What can my machine run?
+python main.py doctor
+
+# 2. Get the model (auto-picked for your hardware)
+curl -fsSL https://ollama.com/install.sh | sh   # if doctor says Ollama missing
+python main.py pull
+
+# 3. Use it
+python main.py chat                     # terminal
+python main.py ui                       # http://127.0.0.1:7860
+python main.py ingest ~/Documents       # index your files
+python main.py ask "what's our rollback procedure?"
+python main.py agent "count lines of python in ./workspace and plot a histogram"
+python main.py serve                    # OpenAI-compatible at :8000/v1
 ```
 
-Create a production build with `npm run build`.
-
-## AI setup — free, no API key needed
-
-The AI works out of the box at **zero cost**. The app talks to a Vercel
-serverless function (`api/ai.js`), which by default calls **Pollinations.ai** —
-a free, keyless, OpenAI-compatible provider (free models cost nothing, no
-signup). No environment variables are required.
-
-To raise the free rate limit (~1 request / 5s), you can optionally register a
-free key at <https://enter.pollinations.ai> and set `AI_API_KEY` — the proxy
-will then use that key with the free provider. You can also point `AI_API_KEY`
-at any other OpenAI-compatible provider:
-
-```
-AI_API_KEY=sk-...          # optional — free provider is used without it
-AI_BASE_URL=https://api.openai.com/v1   # optional, override for other providers
-AI_MODEL=openai            # optional — free default is "openai"
-```
-
-If the AI service is ever unreachable, the app gracefully falls back to
-offline, rule-based guidance — it never breaks.
-
-## Firebase setup
-
-The supplied Firebase web configuration is in `src/firebase.js`, with Firebase
-Authentication, Cloud Firestore, Cloud Storage, and Google Analytics
-initialized and exported. Both default values and optional `VITE_FIREBASE_*`
-environment variable overrides are supported.
-
-In the Firebase console for **ai-health-d2c5b**:
-
-1. Enable **Authentication → Sign-in method → Google** and **Email/Password**.
-2. Add your local and deployed domains (including
-   `ai-health-green-eta.vercel.app`) to **Authentication → Settings →
-   Authorized domains**.
-3. Create a Cloud Firestore database.
-4. **Deploy the rules in `firestore.rules`** — this is what allows users to
-   save their assessments, check-ins, appointments, and contacts. Vercel only
-   deploys the web app; it does not publish Firebase rules.
-
-The repository now includes `firebase.json` and `.firebaserc`, so the rules can
-be deployed directly from the project root:
+Point **any** OpenAI client at it — Continue.dev, Cursor, LangChain, curl:
 
 ```bash
-npx firebase-tools login
-npx firebase-tools deploy --only firestore:rules
+curl http://127.0.0.1:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"local-rag","messages":[{"role":"user","content":"summarize my docs on auth"}]}'
 ```
 
-Alternatively, paste `firestore.rules` into **Firestore → Rules** in the
-Firebase console and click **Publish**.
+### No GPU / no model yet? Try the mock backend
 
-The rules grant each signed-in user read/write access to **only their own**
-data under `users/{uid}/...` (including the `vitals/{type}/entries` subcollection, `medications`, and `medicationLogs`), public read for the emergency-location list,
-signed-in read for the doctor directory, and full access to users with the
-`Admin` custom claim. Without publishing these rules, the previously deployed
-admin-only policy rejects normal users, so both record loading and saving fail
-with `permission-denied`.
-
-> This is a wellness tool, not a diagnostic or emergency-care service.
-
-## Tests
+`scripts/mock_ollama.py` speaks the Ollama HTTP protocol on
+`127.0.0.1:11434` with a tiny deterministic model. With it running, every
+command above works immediately (chat, RAG, agent, UI, API) — useful for
+developing the app before downloading real weights, or for CI:
 
 ```bash
-npm test              # smoke (jsdom) + AI upgrades + features + new features
-npm run test:smoke    # builds the app and exercises every route in jsdom
-npm run test:ai       # urgent-content detector, 14 cases across 6 languages
-npm run test:features # medication-adherence calculator, 7 cases
-npm run test:new      # profile + wellness + symptom-trends logic, 20 cases
+python scripts/mock_ollama.py &        # terminal 1
+python main.py ui                      # terminal 2
+python scripts/smoke.py                # end-to-end self-test (starts its own mock)
 ```
 
-## USSD business service (Step 1)
+## What makes it "powerful" (design notes)
 
-A standalone `*123#` USSD backend (Node + Express) lives in [`ussd/`](ussd/),
-with a browser phone simulator for free local testing:
+| Decision | Why it beats the naive version |
+|---|---|
+| **RRF hybrid retrieval** (dense + BM25) | Dense misses exact identifiers/error codes; BM25 misses paraphrase. Fusing them typically lifts recall 15–30% over either alone. |
+| **Cross-encoder rerank** | Retrieve 30 → rerank → keep 6. Usually the single biggest RAG quality jump for a few hundred ms. |
+| **Query expansion** | One cheap LLM rewrite fixes vocabulary mismatch between your question and the document's jargon. |
+| **numpy store, no DB** | No Chroma/SQLite version hell, no daemon. Handles ~100k chunks comfortably in RAM. Swap to FAISS/HNSW only when you exceed that. |
+| **Brace-balanced JSON parser** | Small models emit prose around their JSON and nest braces inside strings. Regex fails; this doesn't. |
+| **`stop=["OBSERVATION:"]`** | Stops the model hallucinating its own tool results — the #1 local-agent failure mode. |
+| **Two-tier memory** | Rolling LLM summary keeps context bounded; the fact store is vector-searched so old details resurface on demand. |
+| **Workspace jail + denylist** | Path resolution check blocks `../` escapes; regex blocks the classic destructive commands. |
+| **Backend abstraction** | Same code runs on Ollama, llama.cpp, or Transformers — swap `backend` in `data/config.json`. |
+
+**Tuning knobs:**
 
 ```bash
-npm run ussd        # start http://localhost:3000 (simulator + webhook)
-npm run ussd:test   # 19 automated menu-flow tests
+python main.py config --set final_k=10 retrieve_k=50 temperature=0.3
+python main.py config --set model=qwen2.5-coder:32b   # coding specialist
+python main.py config --set use_reranker=false        # faster, slightly worse
+python main.py config --set allow_shell=false         # lock down the agent
 ```
 
-The provider webhook is `POST /ussd` (Africa's Talking format, the standard
-used by MTN/Airtel/Zamtel aggregators) and is also exposed as a Vercel
-function at `/api/ussd`. See [`ussd/README.md`](ussd/README.md) for the
-6-step build plan (Firebase → accounts → admin dashboard → live short code).
+## Firebase configuration
+
+`firebase-config.json` holds the public web-app configuration for Firebase
+project **`ai-health-d2c5b`** (kept when the previous app was removed). These
+are client-safe identifiers, not credentials — access is controlled by
+Firestore Security Rules / Firebase Auth. A service-account private key is
+**not** included and should never be committed.
+
+## Deployment
+
+LocalMind itself is **local-first** — the chat, RAG and agent run as
+long-running Python processes on your machine, which Vercel's serverless
+platform cannot host. The `site/` folder is a static landing page that
+Vercel deploys without a build step (`vercel.json` sets `buildCommand: null`
+and serves `site/`), so the repo's connected Vercel project keeps passing
+deployments and PR checks. To host the actual app on a server, use a
+platform that runs persistent Python processes (Render, Railway, Fly.io,
+or any VPS) — add a `Dockerfile` or run `python main.py ui` directly.
+
+## Natural next steps
+
+- **Voice** — faster-whisper STT + Piper TTS, full offline duplex loop
+- **Vision** — swap in Qwen2.5-VL / Llama-3.2-Vision for screenshots, diagrams, scanned PDFs
+- **QLoRA fine-tune pipeline** — harvest good conversations from this system → train an adapter → hot-swap it
+- **Speculative decoding** — 2–3× throughput using a 0.5B draft model
+- **Multi-agent** — planner/researcher/critic with a shared blackboard
+- **GraphRAG** — entity-relation graph over your corpus for multi-hop questions

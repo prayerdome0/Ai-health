@@ -1,0 +1,17 @@
+{
+  "$comment": "Public Firebase web-app configuration carried over from the previous ai-health project (client-safe values — no secrets). These are the Firebase Web SDK settings; authorization is enforced by Firestore Security Rules, not these values.",
+  "project": "ai-health-d2c5b",
+  "firebaseConfig": {
+    "apiKey": "AIzaSyCl3C2YsBc5r7WS8HRyAtxc5r4LoC4OFfs",
+    "authDomain": "ai-health-d2c5b.firebaseapp.com",
+    "projectId": "ai-health-d2c5b",
+    "storageBucket": "ai-health-d2c5b.firebasestorage.app",
+    "messagingSenderId": "1018985914953",
+    "appId": "1:1018985914953:web:3317363b3be4ad57299598"
+  },
+  "services": {
+    "authentication": "https://console.firebase.google.com/project/ai-health-d2c5b/authentication",
+    "firestore": "https://console.firebase.google.com/project/ai-health-d2c5b/firestore",
+    "storage": "https://console.firebase.google.com/project/ai-health-d2c5b/storage"
+  }
+}
