@@ -100,6 +100,17 @@ are client-safe identifiers, not credentials — access is controlled by
 Firestore Security Rules / Firebase Auth. A service-account private key is
 **not** included and should never be committed.
 
+## Deployment
+
+LocalMind itself is **local-first** — the chat, RAG and agent run as
+long-running Python processes on your machine, which Vercel's serverless
+platform cannot host. The `site/` folder is a static landing page that
+Vercel deploys without a build step (`vercel.json` sets `buildCommand: null`
+and serves `site/`), so the repo's connected Vercel project keeps passing
+deployments and PR checks. To host the actual app on a server, use a
+platform that runs persistent Python processes (Render, Railway, Fly.io,
+or any VPS) — add a `Dockerfile` or run `python main.py ui` directly.
+
 ## Natural next steps
 
 - **Voice** — faster-whisper STT + Piper TTS, full offline duplex loop

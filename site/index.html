@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LocalMind — your private AI, on your hardware</title>
+  <meta name="description" content="LocalMind: a complete local AI system. Chat, hybrid RAG, a tool-using agent, memory, web UI and an OpenAI-compatible API — zero API keys, zero cloud calls." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A0%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#">🧠 LocalMind</a>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#quickstart">Quickstart</a>
+        <a href="#hardware">Hardware</a>
+        <a class="btn btn-small" href="https://github.com/prayerdome0/Ai-health">GitHub ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <h1>Your private AI.<br /><span class="accent">On your hardware.</span></h1>
+    <p class="lede">
+      LocalMind auto-detects your machine, picks the right model, and gives you chat,
+      grounded RAG over your own documents, a tool-using agent, long-term memory,
+      a web UI, and an OpenAI-compatible API. <strong>Zero API keys. Zero cloud calls.</strong>
+    </p>
+    <div class="codeblock">
+      <div class="codeblock-head"><span>terminal</span>
+        <button class="copy" data-copy="python main.py ui">copy</button>
+      </div>
+      <pre><code>pip install -r requirements.txt
+python main.py doctor      # what can my machine run?
+python main.py pull        # fetch the auto-picked model
+python main.py ui          # web UI at http://127.0.0.1:7860</code></pre>
+    </div>
+    <p class="hint">No GPU? No problem — <code>python scripts/mock_ollama.py</code> runs the whole stack
+      with a fake backend so you can try it before downloading any weights.</p>
+  </header>
+
+  <main>
+    <section id="features">
+      <h2>Everything in one entrypoint</h2>
+      <div class="grid">
+        <article class="card">
+          <h3>💬 Chat</h3>
+          <p>Streaming terminal &amp; Gradio chat with rolling conversation summary and a durable fact store that resurfaces old details on demand.</p>
+        </article>
+        <article class="card">
+          <h3>📚 Hybrid RAG</h3>
+          <p>Dense vectors + BM25 fused with Reciprocal Rank Fusion, cross-encoder reranking and query expansion. Answers cite your sources.</p>
+        </article>
+        <article class="card">
+          <h3>🛠️ Agent</h3>
+          <p>A ReAct loop with Python, shell, filesystem, calc and memory tools — jailed to <code>./workspace</code> with a destructive-command denylist.</p>
+        </article>
+        <article class="card">
+          <h3>🔌 OpenAI API</h3>
+          <p><code>/v1/chat/completions</code> with streaming SSE. Point Continue.dev, Cursor, LangChain or curl at <code>localhost:8000</code>.</p>
+        </article>
+        <article class="card">
+          <h3>🗂️ Ingest anything</h3>
+          <p>PDF, DOCX, HTML, Markdown and code → chunked into a numpy-backed index. No database, no daemon, survives restarts.</p>
+        </article>
+        <article class="card">
+          <h3>🧱 Backend-agnostic</h3>
+          <p>Same code runs on Ollama, llama.cpp or Transformers — swap <code>backend</code> in <code>data/config.json</code>.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="quickstart">
+      <h2>Quickstart</h2>
+      <div class="codeblock">
+        <div class="codeblock-head"><span>bash</span>
+          <button class="copy" data-copy="git clone https://github.com/prayerdome0/Ai-health.git
+cd Ai-health
+pip install -r requirements.txt
+python main.py doctor
+curl -fsSL https://ollama.com/install.sh | sh
+python main.py pull
+python main.py chat">copy</button>
+        </div>
+        <pre><code>git clone https://github.com/prayerdome0/Ai-health.git
+cd Ai-health
+pip install -r requirements.txt
+
+python main.py doctor            # hardware report + setup advice
+curl -fsSL https://ollama.com/install.sh | sh   # if doctor says Ollama missing
+python main.py pull              # download the model auto-picked for your hardware
+
+python main.py chat              # terminal chat
+python main.py ui                # web UI
+python main.py ingest ~/Documents
+python main.py ask "what's our rollback procedure?"
+python main.py agent "count lines of python in ./workspace and plot a histogram"
+python main.py serve             # OpenAI-compatible API on :8000/v1</code></pre>
+      </div>
+      <div class="codeblock">
+        <div class="codeblock-head"><span>any OpenAI client</span>
+          <button class="copy" data-copy="curl http://127.0.0.1:8000/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"local-rag\",\"messages\":[{\"role\":\"user\",\"content\":\"summarize my docs on auth\"}]}'">copy</button>
+        </div>
+        <pre><code>curl http://127.0.0.1:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"local-rag","messages":[{"role":"user","content":"summarize my docs on auth"}]}'</code></pre>
+      </div>
+    </section>
+
+    <section id="hardware">
+      <h2>Automatic model selection</h2>
+      <p><code>python main.py doctor</code> sizes the model to your usable memory (GPU VRAM wins, else RAM minus OS headroom):</p>
+      <table>
+        <thead><tr><th>Usable memory</th><th>Model</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>≥ 44 GB</td><td>Llama 3.3 70B Q4</td><td>Frontier-class open weights</td></tr>
+          <tr><td>≥ 19 GB</td><td>Qwen2.5 32B Q4</td><td>Very strong reasoning + code</td></tr>
+          <tr><td>≥ 10 GB</td><td>Qwen2.5 14B Q4</td><td>Best quality/size ratio</td></tr>
+          <tr><td>≥ 5.5 GB</td><td>Qwen2.5 7B Q4</td><td>Fast and solid</td></tr>
+          <tr><td>anything</td><td>Qwen2.5 3B Q4</td><td>Runs anywhere</td></tr>
+        </tbody>
+      </table>
+      <p class="hint">Firebase web configuration from the original ai-health project is preserved in
+        <code>firebase-config.json</code>.</p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>LocalMind · local · private · yours — the AI itself runs on your machine, not this page.</p>
+    <p><a href="https://github.com/prayerdome0/Ai-health">github.com/prayerdome0/Ai-health</a></p>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.copy').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var text = btn.getAttribute('data-copy');
+        var done = function () { btn.textContent = 'copied ✓'; setTimeout(function () { btn.textContent = 'copy'; }, 1500); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, done);
+        } else {
+          var ta = document.createElement('textarea');
+          ta.value = text; document.body.appendChild(ta); ta.select();
+          try { document.execCommand('copy'); } catch (e) {}
+          document.body.removeChild(ta); done();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
