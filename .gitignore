@@ -1,5 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# LocalMind runtime data (indexes, settings, agent workspace, memory)
+data/
+workspace/
+
+# Node / misc
 node_modules/
 dist/
 .env
 .env.*
 !.env.example
+.DS_Store

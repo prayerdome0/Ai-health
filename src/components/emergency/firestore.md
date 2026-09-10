@@ -1,1 +1,0 @@
-emergencies, emergency_locations, emergency_contacts
